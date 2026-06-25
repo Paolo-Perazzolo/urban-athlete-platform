@@ -38,7 +38,7 @@ INSERT INTO exercises (
   'Piegamenti Standard',
   'Classic push-up with hands on the ground, body in straight line from head to heels.',
   ARRAY['chest', 'triceps', 'shoulders', 'core'],
-  ARRAY[], -- No equipment needed
+  ARRAY[]::TEXT[], -- No equipment needed
   2, -- Intermediate
   'strength',
   3,
@@ -65,7 +65,7 @@ INSERT INTO exercises (
   'Piegamenti Diamante',
   'Push-ups with hands close together forming a diamond shape. Intense triceps focus.',
   ARRAY['triceps', 'chest', 'shoulders'],
-  ARRAY[],
+  ARRAY[]::TEXT[],
   3, -- Advanced
   'strength',
   3,
@@ -91,7 +91,7 @@ INSERT INTO exercises (
   'Piegamenti Pike',
   'Push-ups with hips raised high, forming an inverted V. Builds shoulder strength for handstand push-ups.',
   ARRAY['shoulders', 'triceps', 'upper_chest'],
-  ARRAY[],
+  ARRAY[]::TEXT[],
   2, -- Intermediate
   'strength',
   3,
@@ -233,7 +233,7 @@ INSERT INTO exercises (
   'Squat a Corpo Libero',
   'Basic squat: feet shoulder-width, lower hips until thighs parallel to ground.',
   ARRAY['quads', 'glutes', 'hamstrings'],
-  ARRAY[],
+  ARRAY[]::TEXT[],
   1, -- Beginner
   'strength',
   3,
@@ -281,7 +281,7 @@ INSERT INTO exercises (
   'Squat a Una Gamba',
   'Single-leg squat with other leg extended forward. Elite leg strength and balance.',
   ARRAY['quads', 'glutes', 'hamstrings', 'core'],
-  ARRAY[],
+  ARRAY[]::TEXT[],
   4, -- Advanced
   'strength',
   3,
@@ -311,7 +311,7 @@ INSERT INTO exercises (
   'Plank',
   'Hold body in straight line on forearms and toes. Core endurance builder.',
   ARRAY['core', 'shoulders'],
-  ARRAY[],
+  ARRAY[]::TEXT[],
   1, -- Beginner
   'endurance',
   3,
