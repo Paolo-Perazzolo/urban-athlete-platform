@@ -1,0 +1,12 @@
+{
+  "name": "urban-athlete-platform",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "notion:setup": "node scripts/notion-setup.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "dotenv": "^16.4.5"
+  }
+}
