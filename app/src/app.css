@@ -1,0 +1,77 @@
+/* Tailwind base styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+	/* Smooth scrolling */
+	html {
+		scroll-behavior: smooth;
+	}
+
+	/* Base body styles */
+	body {
+		@apply bg-neutral-50 text-neutral-900;
+		@apply font-sans antialiased;
+	}
+
+	/* Headings */
+	h1, h2, h3, h4, h5, h6 {
+		@apply font-display font-bold;
+	}
+}
+
+/* Custom component styles */
+@layer components {
+	/* Card component base */
+	.card {
+		@apply bg-white rounded-2xl shadow-card;
+		@apply transition-shadow duration-200;
+	}
+
+	.card:hover {
+		@apply shadow-card-hover;
+	}
+
+	/* Button base styles */
+	.btn {
+		@apply px-6 py-3 rounded-xl font-semibold;
+		@apply transition-all duration-200;
+		@apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+	}
+
+	.btn-primary {
+		@apply bg-primary-500 text-white;
+		@apply hover:bg-primary-600;
+		@apply focus:ring-primary-500;
+	}
+
+	.btn-accent {
+		@apply bg-accent-500 text-white;
+		@apply hover:bg-accent-600;
+		@apply focus:ring-accent-500;
+	}
+
+	/* Input base styles */
+	.input {
+		@apply w-full px-4 py-3 rounded-xl;
+		@apply border border-neutral-300;
+		@apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+		@apply transition-all duration-200;
+	}
+}
+
+/* Custom utilities */
+@layer utilities {
+	/* Container with max width */
+	.container-custom {
+		@apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+	}
+
+	/* Gradient text */
+	.text-gradient {
+		@apply bg-clip-text text-transparent;
+		@apply bg-gradient-to-r from-primary-500 to-accent-500;
+	}
+}

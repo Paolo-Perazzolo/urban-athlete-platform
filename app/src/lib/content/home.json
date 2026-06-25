@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "title": "Find Your Spot. Follow Your Plan. Climb the Ranks.",
+    "subtitle": "The hyper-local platform for outdoor athletes in Trieste and Milan",
+    "cta_primary": "Get Started",
+    "cta_secondary": "Explore Spots",
+    "image": "/images/hero-athlete.jpg"
+  },
+  "features": [
+    {
+      "icon": "map-pin",
+      "title": "Discover Training Spots",
+      "description": "Find pull-up bars, parallel bars, and outdoor gyms near you with photos and reviews"
+    },
+    {
+      "icon": "dumbbell",
+      "title": "Smart Training Plans",
+      "description": "Get personalized workout plans based on your level and available equipment"
+    },
+    {
+      "icon": "trophy",
+      "title": "City Leaderboards",
+      "description": "Compete with athletes in your city, earn XP, and climb the ranks"
+    }
+  ],
+  "cities": {
+    "title": "Starting in Two Cities",
+    "subtitle": "We're building the best local community for outdoor athletes",
+    "list": [
+      {
+        "name": "Trieste",
+        "flag": "🇮🇹",
+        "spots": "10+",
+        "athletes": "50+"
+      },
+      {
+        "name": "Milan",
+        "flag": "🇮🇹",
+        "spots": "15+",
+        "athletes": "100+"
+      }
+    ]
+  },
+  "cta_final": {
+    "title": "Ready to Start Training?",
+    "subtitle": "Join the community of outdoor athletes",
+    "button": "Sign Up Free"
+  }
+}
