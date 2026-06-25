@@ -12,3 +12,5 @@
 | 2025-06-25 | Hostinger Business Web Hosting available — evaluate for hosting instead of / alongside Vercel | 01 |
 | 2025-06-25 | Created `update-docs` workflow to keep documentation in sync with decisions | — |
 | 2025-06-25 | Notion workspace structure defined: 1 DB (Backlog) + 4 pages (Decisions, Ideas, Weekly Review, Sprint Board view) | 06 |
+| 2025-06-25 | Sprint 0 completed: SvelteKit app scaffold, atomic design components, content system (JSON), database schema, Revolut/Freeletics-inspired design | app/* |
+| 2025-06-25 | Corporate network blocks npm - will test/deploy from home network | — |
