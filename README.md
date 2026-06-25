@@ -19,13 +19,22 @@ A free, hyper-local web platform for outdoor/calisthenics athletes to discover t
 | [AI Agent Guide](docs/04-ai-agent-guide.md) | Model selection, token optimization, workflow tips | ✅ Draft |
 | [Decisions Log](docs/05-decisions-log.md) | Running log of all strategic/technical decisions | ✅ Active |
 | [Notion Setup](docs/06-notion-setup.md) | Notion workspace structure and daily workflow | ✅ Ready |
+| [System Architecture](docs/06-system-architecture-diagram.md) | Architecture diagrams, data flows, tech stack | ✅ Complete |
 
-## 🚀 Next Steps
+## 🚀 Current Status
 
-1. **Review these documents** — add your feedback, correct assumptions
-2. **Finalize MVP scope** — confirm the MoSCoW priorities
-3. **Start Sprint 0** — project setup, database, deployment pipeline
-4. **Seed content** — identify and photograph real training spots
+**Sprint 0: COMPLETE ✅**
+- Project setup, Git workflow, SvelteKit app
+- Database schema + 15 exercises loaded
+- Design system + landing page
+- Full documentation
+
+**Next: Sprint 1**
+1. **Deploy to Vercel** — get the app live
+2. **Authentication** — login/signup with Supabase Auth
+3. **Navigation** — header, footer, mobile menu
+4. **Spots map** — Leaflet + OpenStreetMap integration
+5. **Add spot form** — let users contribute locations
 
 ## 💰 Cost Summary
 
