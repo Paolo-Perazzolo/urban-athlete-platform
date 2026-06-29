@@ -52,6 +52,9 @@
           Spots
         </a>
         {#if user}
+          <a href="/plan" class="text-neutral-700 hover:text-primary-600 font-medium transition">
+            My Plan
+          </a>
           <a href="/profile" class="text-neutral-700 hover:text-primary-600 font-medium transition">
             Profile
           </a>
@@ -118,6 +121,13 @@
           Spots
         </a>
         {#if user}
+          <a
+            href="/plan"
+            class="block text-neutral-700 hover:text-primary-600 font-medium py-2"
+            on:click={() => mobileMenuOpen = false}
+          >
+            My Plan
+          </a>
           <a
             href="/profile"
             class="block text-neutral-700 hover:text-primary-600 font-medium py-2"
