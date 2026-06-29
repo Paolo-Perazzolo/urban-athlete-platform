@@ -37,7 +37,14 @@
       }, 2000);
       
     } catch (err) {
-      error = err.message;
+      // Handle specific error types
+      if (err.message?.includes('429') || err.message?.includes('rate limit')) {
+        error = 'Too many signup attempts. Please wait an hour and try again, or contact support.';
+      } else if (err.message?.includes('already registered')) {
+        error = 'This email is already registered. Try signing in instead.';
+      } else {
+        error = err.message;
+      }
     } finally {
       loading = false;
     }
@@ -51,7 +58,13 @@
 
     {#if error}
       <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-        {error}
+        <p class="font-medium mb-2">{error}</p>
+        {#if error.includes('rate limit') || error.includes('Too many')}
+          <p class="text-sm mt-2">
+            Already have an account? 
+            <a href="/auth/login" class="underline font-medium">Sign in here</a>
+          </p>
+        {/if}
       </div>
     {/if}
 
