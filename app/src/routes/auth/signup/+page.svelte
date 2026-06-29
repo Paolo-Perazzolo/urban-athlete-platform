@@ -29,6 +29,23 @@
 
       if (signUpError) throw signUpError;
       
+      // Manually create profile (fallback if trigger doesn't exist)
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            username: username,
+            city: city,
+            experience_level: 'beginner'
+          });
+        
+        // Ignore error if profile already exists (trigger created it)
+        if (profileError && !profileError.message.includes('duplicate')) {
+          console.warn('Profile creation warning:', profileError);
+        }
+      }
+      
       success = true;
       
       // Redirect to login after 2 seconds
