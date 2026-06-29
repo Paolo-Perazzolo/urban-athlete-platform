@@ -92,31 +92,31 @@
   }
 </script>
 
-<div class="min-h-screen bg-neutral-50 py-12 px-4">
+<div class="min-h-screen bg-neutral-950 py-12 px-4">
   <div class="max-w-5xl mx-auto">
     <div class="mb-8">
-      <h1 class="text-4xl font-bold text-neutral-900 mb-2">Your Training Plan</h1>
-      <p class="text-neutral-600">Personalized workout program based on your goals and available equipment</p>
+      <h1 class="text-4xl font-bold text-neutral-100 mb-2">Your Training Plan</h1>
+      <p class="text-neutral-400">Personalized workout program based on your goals and available equipment</p>
     </div>
 
     {#if loading}
       <div class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        <p class="mt-4 text-neutral-600">Loading your plan...</p>
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-300"></div>
+        <p class="mt-4 text-neutral-400">Loading your plan...</p>
       </div>
     {:else if error}
-      <div class="card p-8 bg-red-50 border border-red-200">
-        <p class="text-red-700 font-medium">{error}</p>
+      <div class="card p-8 bg-neutral-900 border border-red-900">
+        <p class="text-red-300 font-medium">{error}</p>
       </div>
     {:else if !plan}
       <div class="card p-12 text-center">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-primary-100 rounded-full mb-6">
-          <svg class="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-neutral-950 border border-neutral-800 rounded-sm mb-6">
+          <svg class="w-10 h-10 text-neutral-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <h2 class="text-2xl font-bold text-neutral-900 mb-4">No Training Plan Yet</h2>
-        <p class="text-neutral-600 mb-8 max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold text-neutral-100 mb-4">No Training Plan Yet</h2>
+        <p class="text-neutral-400 mb-8 max-w-2xl mx-auto">
           Generate a personalized training plan based on your profile and available equipment.
         </p>
         <button
@@ -134,15 +134,15 @@
         <div class="card p-6">
           <div class="flex justify-between items-start mb-4">
             <div>
-              <h2 class="text-2xl font-bold text-neutral-900">{plan.plan_data.plan_name}</h2>
-              <p class="text-neutral-600 mt-1">
+              <h2 class="text-2xl font-bold text-neutral-100">{plan.plan_data.plan_name}</h2>
+              <p class="text-neutral-400 mt-1">
                 {plan.plan_data.weeks} weeks • {plan.plan_data.days_per_week} days per week
               </p>
             </div>
             <button
               on:click={generateNewPlan}
               disabled={generating}
-              class="btn bg-neutral-100 hover:bg-neutral-200 text-neutral-700"
+              class="btn btn-accent"
             >
               {generating ? 'Generating...' : 'Regenerate'}
             </button>
@@ -150,9 +150,9 @@
           
           <!-- Plan Notes -->
           {#if plan.plan_data.notes && plan.plan_data.notes.length > 0}
-            <div class="bg-primary-50 rounded-lg p-4 mt-4">
-              <h3 class="font-semibold text-primary-900 mb-2">📋 Training Notes</h3>
-              <ul class="space-y-1 text-sm text-primary-800">
+            <div class="bg-neutral-950 border border-neutral-800 rounded-sm p-4 mt-4">
+              <h3 class="font-semibold text-neutral-100 mb-2">Training Notes</h3>
+              <ul class="space-y-1 text-sm text-neutral-300">
                 {#each plan.plan_data.notes as note}
                   <li>• {note}</li>
                 {/each}
@@ -164,23 +164,23 @@
         <!-- Workout Days -->
         {#each plan.plan_data.workouts as workout, dayIndex}
           <div class="card p-6">
-            <h3 class="text-xl font-bold text-neutral-900 mb-4">
+            <h3 class="text-xl font-bold text-neutral-100 mb-4">
               Day {dayIndex + 1}: {workout.name}
             </h3>
             
             <div class="space-y-4">
               {#each workout.exercises as exercise, exIndex}
-                <div class="flex items-start space-x-4 p-4 bg-neutral-50 rounded-lg">
-                  <div class="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">
+                <div class="flex items-start space-x-4 p-4 bg-neutral-950 border border-neutral-800 rounded-sm">
+                  <div class="flex-shrink-0 w-8 h-8 bg-neutral-100 text-neutral-950 rounded-sm flex items-center justify-center font-bold">
                     {exIndex + 1}
                   </div>
                   <div class="flex-1">
-                    <h4 class="font-semibold text-neutral-900">{exercise.name}</h4>
-                    <p class="text-sm text-neutral-600 mt-1">
+                    <h4 class="font-semibold text-neutral-100">{exercise.name}</h4>
+                    <p class="text-sm text-neutral-400 mt-1">
                       {exercise.sets} sets × {exercise.reps} reps • Rest: {exercise.rest_seconds}s
                     </p>
                     {#if exercise.tips}
-                      <p class="text-sm text-neutral-500 mt-2 italic">💡 {exercise.tips}</p>
+                      <p class="text-sm text-neutral-500 mt-2 italic">{exercise.tips}</p>
                     {/if}
                   </div>
                 </div>

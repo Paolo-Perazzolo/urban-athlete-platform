@@ -12,7 +12,7 @@
 
 	/* Base body styles */
 	body {
-		@apply bg-neutral-50 text-neutral-900;
+		@apply bg-neutral-950 text-neutral-100;
 		@apply font-sans antialiased;
 	}
 
@@ -26,38 +26,39 @@
 @layer components {
 	/* Card component base */
 	.card {
-		@apply bg-white rounded-2xl shadow-card;
-		@apply transition-shadow duration-200;
+		@apply bg-neutral-900 border border-neutral-800 rounded-md;
+		@apply transition-colors duration-200;
 	}
 
 	.card:hover {
-		@apply shadow-card-hover;
+		@apply border-neutral-700;
 	}
 
 	/* Button base styles */
 	.btn {
-		@apply px-6 py-3 rounded-xl font-semibold;
+		@apply px-6 py-3 rounded-sm font-semibold;
 		@apply transition-all duration-200;
-		@apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+		@apply focus:outline-none focus:ring-1 focus:ring-offset-0;
 	}
 
 	.btn-primary {
-		@apply bg-primary-500 text-white;
-		@apply hover:bg-primary-600;
-		@apply focus:ring-primary-500;
+		@apply bg-neutral-100 text-neutral-950;
+		@apply hover:bg-white;
+		@apply focus:ring-neutral-300;
 	}
 
 	.btn-accent {
-		@apply bg-accent-500 text-white;
-		@apply hover:bg-accent-600;
-		@apply focus:ring-accent-500;
+		@apply bg-neutral-800 text-neutral-100 border border-neutral-700;
+		@apply hover:bg-neutral-700;
+		@apply focus:ring-neutral-500;
 	}
 
 	/* Input base styles */
 	.input {
-		@apply w-full px-4 py-3 rounded-xl;
-		@apply border border-neutral-300;
-		@apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+		@apply w-full px-4 py-3 rounded-sm;
+		@apply border border-neutral-800 bg-neutral-950 text-neutral-100;
+		@apply placeholder:text-neutral-500;
+		@apply focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-neutral-600;
 		@apply transition-all duration-200;
 	}
 }
@@ -69,9 +70,8 @@
 		@apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 	}
 
-	/* Gradient text */
+	/* High contrast text */
 	.text-gradient {
-		@apply bg-clip-text text-transparent;
-		@apply bg-gradient-to-r from-primary-500 to-accent-500;
+		@apply text-neutral-100;
 	}
 }

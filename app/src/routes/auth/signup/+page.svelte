@@ -68,13 +68,13 @@
   }
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-accent-500 px-4">
+<div class="min-h-screen flex items-center justify-center bg-neutral-950 px-4">
   <div class="card max-w-md w-full p-8">
     <h1 class="text-3xl font-bold text-center mb-2">Join Urban Athlete</h1>
-    <p class="text-neutral-600 text-center mb-8">Create your account and start training</p>
+    <p class="text-neutral-400 text-center mb-8">Create your account and start training</p>
 
     {#if error}
-      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+      <div class="bg-neutral-900 border border-red-900 text-red-300 px-4 py-3 rounded-sm mb-6">
         <p class="font-medium mb-2">{error}</p>
         {#if error.includes('rate limit') || error.includes('Too many')}
           <p class="text-sm mt-2">
@@ -86,14 +86,14 @@
     {/if}
 
     {#if success}
-      <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+      <div class="bg-neutral-900 border border-green-900 text-green-300 px-4 py-3 rounded-sm mb-6">
         Account created! Check your email to verify. Redirecting...
       </div>
     {/if}
 
     <form on:submit|preventDefault={handleSignup} class="space-y-6">
       <div>
-        <label for="username" class="block text-sm font-medium text-neutral-700 mb-2">
+        <label for="username" class="block text-sm font-medium text-neutral-300 mb-2">
           Username
         </label>
         <input
@@ -107,7 +107,7 @@
       </div>
 
       <div>
-        <label for="email" class="block text-sm font-medium text-neutral-700 mb-2">
+        <label for="email" class="block text-sm font-medium text-neutral-300 mb-2">
           Email
         </label>
         <input
@@ -121,7 +121,7 @@
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium text-neutral-700 mb-2">
+        <label for="password" class="block text-sm font-medium text-neutral-300 mb-2">
           Password
         </label>
         <input
@@ -137,7 +137,7 @@
       </div>
 
       <div>
-        <label for="city" class="block text-sm font-medium text-neutral-700 mb-2">
+        <label for="city" class="block text-sm font-medium text-neutral-300 mb-2">
           City
         </label>
         <select
@@ -161,9 +161,9 @@
     </form>
 
     <div class="mt-6 text-center">
-      <p class="text-neutral-600">
+      <p class="text-neutral-400">
         Already have an account?
-        <a href="/auth/login" class="text-primary-600 hover:text-primary-700 font-medium">
+        <a href="/auth/login" class="text-neutral-100 hover:text-white font-medium">
           Sign in
         </a>
       </p>

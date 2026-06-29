@@ -10,8 +10,8 @@
 </script>
 
 <!-- Hero Section -->
-<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-accent-500">
-  <div class="container-custom text-center text-white">
+<section class="min-h-screen flex items-center justify-center bg-neutral-950">
+  <div class="container-custom text-center text-neutral-100">
     <!-- Main Title -->
     <h1 class="text-5xl md:text-7xl font-display font-bold mb-6">
       {content.hero.title}
@@ -27,7 +27,7 @@
       <a href="/auth/signup" class="btn btn-accent text-lg px-8 py-4">
         {content.hero.cta_primary}
       </a>
-      <a href="/spots" class="btn bg-white text-primary-600 hover:bg-neutral-50 text-lg px-8 py-4">
+      <a href="/spots" class="btn btn-accent text-lg px-8 py-4">
         {content.hero.cta_secondary}
       </a>
     </div>
@@ -35,14 +35,14 @@
 </section>
 
 <!-- Features Section -->
-<section class="py-24 bg-white">
+<section class="py-24 bg-neutral-950 border-t border-neutral-900">
   <div class="container-custom">
     <div class="grid md:grid-cols-3 gap-12">
       <!-- Loop through features from JSON -->
       {#each content.features as feature}
         <div class="text-center">
           <!-- Icon placeholder (we'll add real icons later) -->
-          <div class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div class="w-16 h-16 bg-neutral-900 border border-neutral-800 rounded-sm flex items-center justify-center mx-auto mb-6">
             <span class="text-3xl">🏋️</span>
           </div>
           
@@ -52,7 +52,7 @@
           </h3>
           
           <!-- Feature description -->
-          <p class="text-neutral-600 text-lg">
+          <p class="text-neutral-400 text-lg">
             {feature.description}
           </p>
         </div>
@@ -62,12 +62,12 @@
 </section>
 
 <!-- Cities Section -->
-<section class="py-24 bg-neutral-50">
+<section class="py-24 bg-neutral-950 border-t border-neutral-900">
   <div class="container-custom text-center">
     <h2 class="text-4xl md:text-5xl font-bold mb-6">
       {content.cities.title}
     </h2>
-    <p class="text-xl text-neutral-600 mb-12">
+    <p class="text-xl text-neutral-400 mb-12">
       {content.cities.subtitle}
     </p>
     
@@ -76,13 +76,13 @@
         <div class="card p-8">
           <div class="text-5xl mb-4">{city.flag}</div>
           <h3 class="text-3xl font-bold mb-4">{city.name}</h3>
-          <div class="flex justify-center gap-8 text-neutral-600">
+          <div class="flex justify-center gap-8 text-neutral-400">
             <div>
-              <div class="text-2xl font-bold text-primary-500">{city.spots}</div>
+              <div class="text-2xl font-bold text-neutral-100">{city.spots}</div>
               <div class="text-sm">Training Spots</div>
             </div>
             <div>
-              <div class="text-2xl font-bold text-accent-500">{city.athletes}</div>
+              <div class="text-2xl font-bold text-neutral-100">{city.athletes}</div>
               <div class="text-sm">Athletes</div>
             </div>
           </div>
@@ -93,7 +93,7 @@
 </section>
 
 <!-- Final CTA Section -->
-<section class="py-24 bg-primary-600 text-white">
+<section class="py-24 bg-neutral-900 border-t border-neutral-800 text-neutral-100">
   <div class="container-custom text-center">
     <h2 class="text-4xl md:text-5xl font-bold mb-6">
       {content.cta_final.title}
@@ -101,8 +101,8 @@
     <p class="text-xl mb-12 opacity-90">
       {content.cta_final.subtitle}
     </p>
-    <button class="btn btn-accent text-lg px-12 py-4">
+    <a href="/auth/signup" class="btn btn-primary text-lg px-12 py-4 inline-block">
       {content.cta_final.button}
-    </button>
+    </a>
   </div>
 </section>

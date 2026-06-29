@@ -30,32 +30,32 @@
   }
 </script>
 
-<nav class="bg-white shadow-sm sticky top-0 z-50">
+<nav class="bg-neutral-950 border-b border-neutral-800 sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <!-- Logo -->
       <div class="flex items-center">
         <a href="/" class="flex items-center space-x-2">
-          <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-xl">UA</span>
+          <div class="w-10 h-10 bg-neutral-100 rounded-sm flex items-center justify-center">
+            <span class="text-neutral-950 font-bold text-xl">UA</span>
           </div>
-          <span class="text-xl font-bold text-neutral-900 hidden sm:block">Urban Athlete</span>
+          <span class="text-xl font-bold text-neutral-100 hidden sm:block">Urban Athlete</span>
         </a>
       </div>
 
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-8">
-        <a href="/" class="text-neutral-700 hover:text-primary-600 font-medium transition">
+        <a href="/" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
           Home
         </a>
-        <a href="/spots" class="text-neutral-700 hover:text-primary-600 font-medium transition">
+        <a href="/spots" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
           Spots
         </a>
         {#if user}
-          <a href="/plan" class="text-neutral-700 hover:text-primary-600 font-medium transition">
+          <a href="/plan" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
             My Plan
           </a>
-          <a href="/profile" class="text-neutral-700 hover:text-primary-600 font-medium transition">
+          <a href="/profile" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
             Profile
           </a>
         {/if}
@@ -64,17 +64,17 @@
       <!-- Desktop Auth Buttons -->
       <div class="hidden md:flex items-center space-x-4">
         {#if user}
-          <span class="text-sm text-neutral-600">
+          <span class="text-sm text-neutral-400">
             {user.email}
           </span>
           <button
             on:click={handleSignOut}
-            class="btn bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-4 py-2"
+            class="btn btn-accent px-4 py-2"
           >
             Sign Out
           </button>
         {:else}
-          <a href="/auth/login" class="btn bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-4 py-2">
+          <a href="/auth/login" class="btn btn-accent px-4 py-2">
             Sign In
           </a>
           <a href="/auth/signup" class="btn btn-primary px-4 py-2">
@@ -87,7 +87,7 @@
       <div class="md:hidden">
         <button
           on:click={toggleMobileMenu}
-          class="text-neutral-700 hover:text-primary-600 p-2"
+          class="text-neutral-300 hover:text-neutral-100 p-2"
           aria-label="Toggle menu"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,18 +104,18 @@
 
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
-    <div class="md:hidden border-t border-neutral-200">
+    <div class="md:hidden border-t border-neutral-800 bg-neutral-950">
       <div class="px-4 py-4 space-y-3">
         <a
           href="/"
-          class="block text-neutral-700 hover:text-primary-600 font-medium py-2"
+          class="block text-neutral-300 hover:text-neutral-100 font-medium py-2"
           on:click={() => mobileMenuOpen = false}
         >
           Home
         </a>
         <a
           href="/spots"
-          class="block text-neutral-700 hover:text-primary-600 font-medium py-2"
+          class="block text-neutral-300 hover:text-neutral-100 font-medium py-2"
           on:click={() => mobileMenuOpen = false}
         >
           Spots
@@ -123,28 +123,28 @@
         {#if user}
           <a
             href="/plan"
-            class="block text-neutral-700 hover:text-primary-600 font-medium py-2"
+            class="block text-neutral-300 hover:text-neutral-100 font-medium py-2"
             on:click={() => mobileMenuOpen = false}
           >
             My Plan
           </a>
           <a
             href="/profile"
-            class="block text-neutral-700 hover:text-primary-600 font-medium py-2"
+            class="block text-neutral-300 hover:text-neutral-100 font-medium py-2"
             on:click={() => mobileMenuOpen = false}
           >
             Profile
           </a>
           <button
             on:click={() => { handleSignOut(); mobileMenuOpen = false; }}
-            class="w-full text-left text-neutral-700 hover:text-primary-600 font-medium py-2"
+            class="w-full text-left text-neutral-300 hover:text-neutral-100 font-medium py-2"
           >
             Sign Out
           </button>
         {:else}
           <a
             href="/auth/login"
-            class="block btn bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-center py-2"
+            class="block btn btn-accent text-center py-2"
             on:click={() => mobileMenuOpen = false}
           >
             Sign In
