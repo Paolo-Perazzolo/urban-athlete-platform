@@ -24,12 +24,12 @@
     
     <!-- CTA Buttons -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <button class="btn btn-accent text-lg px-8 py-4">
+      <a href="/auth/signup" class="btn btn-accent text-lg px-8 py-4">
         {content.hero.cta_primary}
-      </button>
-      <button class="btn bg-white text-primary-600 hover:bg-neutral-50 text-lg px-8 py-4">
+      </a>
+      <a href="/spots" class="btn bg-white text-primary-600 hover:bg-neutral-50 text-lg px-8 py-4">
         {content.hero.cta_secondary}
-      </button>
+      </a>
     </div>
   </div>
 </section>

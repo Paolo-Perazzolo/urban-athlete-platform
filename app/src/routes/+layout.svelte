@@ -7,7 +7,11 @@
 <script>
   // Import global styles (Tailwind CSS)
   import '../app.css';
+  import Navigation from '$lib/components/organisms/Navigation.svelte';
 </script>
+
+<!-- Navigation appears on every page -->
+<Navigation />
 
 <!-- 
   <slot /> is where page content appears
