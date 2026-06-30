@@ -6,6 +6,11 @@
   let password = '';
   let username = '';
   let city = 'trieste';
+  let age = 25;
+  let gender = 'male';
+  let experienceLevel = 'beginner';
+  let trainingDaysPerWeek = 3;
+  let trainingGoal = 'general';
   let loading = false;
   let error = '';
   let success = false;
@@ -15,35 +20,44 @@
       loading = true;
       error = '';
       
-      // Sign up with Supabase Auth
+      const profileFields = {
+        username,
+        city,
+        age: Number(age),
+        gender,
+        experience_level: experienceLevel,
+        training_days_per_week: Number(trainingDaysPerWeek),
+        training_goal: trainingGoal
+      };
+
+      // 1. Sign up with Supabase Auth (metadata is stored in auth.users)
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            username,
-            city
-          }
-        }
+        options: { data: profileFields }
       });
 
       if (signUpError) throw signUpError;
-      
-      // Manually create profile (fallback if trigger doesn't exist)
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            username: username,
-            city: city,
-            experience_level: 'beginner'
-          });
-        
-        // Ignore error if profile already exists (trigger created it)
-        if (profileError && !profileError.message.includes('duplicate')) {
-          console.warn('Profile creation warning:', profileError);
-        }
+      if (!data.user) throw new Error('Signup succeeded but no user returned');
+
+      // 2. Create/update profile via RPC (SECURITY DEFINER bypasses RLS)
+      const { error: rpcError } = await supabase.rpc('upsert_profile', {
+        p_id: data.user.id,
+        p_username: profileFields.username,
+        p_city: profileFields.city,
+        p_age: profileFields.age,
+        p_gender: profileFields.gender,
+        p_experience_level: profileFields.experience_level,
+        p_training_days_per_week: profileFields.training_days_per_week,
+        p_training_goal: profileFields.training_goal
+      });
+
+      if (rpcError) {
+        console.error('Profile RPC failed:', rpcError);
+        throw new Error(
+          `Account created but profile save failed (${rpcError.code || rpcError.message}). ` +
+          'Please go to your Profile page after login to complete setup.'
+        );
       }
       
       success = true;
@@ -54,7 +68,6 @@
       }, 2000);
       
     } catch (err) {
-      // Handle specific error types
       if (err.message?.includes('429') || err.message?.includes('rate limit')) {
         error = 'Too many signup attempts. Please wait an hour and try again, or contact support.';
       } else if (err.message?.includes('already registered')) {
@@ -107,6 +120,22 @@
       </div>
 
       <div>
+        <label for="age" class="block text-sm font-medium text-neutral-300 mb-2">
+          Age
+        </label>
+        <input
+          id="age"
+          type="number"
+          bind:value={age}
+          required
+          min="13"
+          max="90"
+          class="input w-full"
+          placeholder="25"
+        />
+      </div>
+
+      <div>
         <label for="email" class="block text-sm font-medium text-neutral-300 mb-2">
           Email
         </label>
@@ -148,6 +177,69 @@
         >
           <option value="trieste">Trieste</option>
           <option value="milan">Milan</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="gender" class="block text-sm font-medium text-neutral-300 mb-2">
+          Gender
+        </label>
+        <select
+          id="gender"
+          bind:value={gender}
+          class="input w-full"
+        >
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="experience-level" class="block text-sm font-medium text-neutral-300 mb-2">
+          Experience Level
+        </label>
+        <select
+          id="experience-level"
+          bind:value={experienceLevel}
+          required
+          class="input w-full"
+        >
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="training-days" class="block text-sm font-medium text-neutral-300 mb-2">
+          Training Days per Week
+        </label>
+        <input
+          id="training-days"
+          type="number"
+          bind:value={trainingDaysPerWeek}
+          required
+          min="1"
+          max="7"
+          class="input w-full"
+        />
+      </div>
+
+      <div>
+        <label for="training-goal" class="block text-sm font-medium text-neutral-300 mb-2">
+          Training Goal
+        </label>
+        <select
+          id="training-goal"
+          bind:value={trainingGoal}
+          required
+          class="input w-full"
+        >
+          <option value="general">General Fitness</option>
+          <option value="strength">Strength</option>
+          <option value="endurance">Endurance</option>
+          <option value="skills">Skills</option>
         </select>
       </div>
 

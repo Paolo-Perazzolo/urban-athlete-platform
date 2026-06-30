@@ -1,29 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
-  import { supabase } from '$lib/utils/supabase';
-  import { goto } from '$app/navigation';
-  
-  let user = null;
   let mobileMenuOpen = false;
-
-  onMount(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      user = session?.user ?? null;
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      user = session?.user ?? null;
-    });
-
-    return () => subscription.unsubscribe();
-  });
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    goto('/');
-  }
 
   function toggleMobileMenu() {
     mobileMenuOpen = !mobileMenuOpen;
@@ -51,36 +27,16 @@
         <a href="/spots" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
           Spots
         </a>
-        {#if user}
-          <a href="/plan" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
-            My Plan
-          </a>
-          <a href="/profile" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
-            Profile
-          </a>
-        {/if}
+        <a href="/plan" class="text-neutral-300 hover:text-neutral-100 font-medium transition-colors">
+          Training Plan
+        </a>
       </div>
 
-      <!-- Desktop Auth Buttons -->
-      <div class="hidden md:flex items-center space-x-4">
-        {#if user}
-          <span class="text-sm text-neutral-400">
-            {user.email}
-          </span>
-          <button
-            on:click={handleSignOut}
-            class="btn btn-accent px-4 py-2"
-          >
-            Sign Out
-          </button>
-        {:else}
-          <a href="/auth/login" class="btn btn-accent px-4 py-2">
-            Sign In
-          </a>
-          <a href="/auth/signup" class="btn btn-primary px-4 py-2">
-            Sign Up
-          </a>
-        {/if}
+      <!-- Desktop CTA -->
+      <div class="hidden md:flex items-center">
+        <a href="/plan" class="btn btn-primary px-5 py-2">
+          Generate Plan
+        </a>
       </div>
 
       <!-- Mobile menu button -->
@@ -120,43 +76,20 @@
         >
           Spots
         </a>
-        {#if user}
-          <a
-            href="/plan"
-            class="block text-neutral-300 hover:text-neutral-100 font-medium py-2"
-            on:click={() => mobileMenuOpen = false}
-          >
-            My Plan
-          </a>
-          <a
-            href="/profile"
-            class="block text-neutral-300 hover:text-neutral-100 font-medium py-2"
-            on:click={() => mobileMenuOpen = false}
-          >
-            Profile
-          </a>
-          <button
-            on:click={() => { handleSignOut(); mobileMenuOpen = false; }}
-            class="w-full text-left text-neutral-300 hover:text-neutral-100 font-medium py-2"
-          >
-            Sign Out
-          </button>
-        {:else}
-          <a
-            href="/auth/login"
-            class="block btn btn-accent text-center py-2"
-            on:click={() => mobileMenuOpen = false}
-          >
-            Sign In
-          </a>
-          <a
-            href="/auth/signup"
-            class="block btn btn-primary text-center py-2"
-            on:click={() => mobileMenuOpen = false}
-          >
-            Sign Up
-          </a>
-        {/if}
+        <a
+          href="/plan"
+          class="block text-neutral-300 hover:text-neutral-100 font-medium py-2"
+          on:click={() => mobileMenuOpen = false}
+        >
+          Training Plan
+        </a>
+        <a
+          href="/plan"
+          class="block btn btn-primary text-center py-2"
+          on:click={() => mobileMenuOpen = false}
+        >
+          Generate Plan
+        </a>
       </div>
     </div>
   {/if}

@@ -1,6 +1,6 @@
 # Setup Instructions
 
-## What I've Created So Far
+## Current Project State
 
 ✅ **Configuration files:**
 - `package.json` - Dependencies (SvelteKit, Tailwind, Supabase)
@@ -9,44 +9,48 @@
 - `vite.config.js` - Build tool config
 - `postcss.config.js` - CSS processing
 
-✅ **Base styles:**
-- `src/app.css` - Global styles with Tailwind
-- Custom colors inspired by Revolut & Freeletics
-- Reusable component classes (card, btn, input)
+✅ **App features shipped:**
+- Supabase authentication (login/signup)
+- Profile page integration
+- Spots page placeholder
+- Deterministic training plan generation flow
 
-✅ **Content system:**
-- `src/lib/content/home.json` - Landing page content (easy to edit!)
-- JSON structure for all text and images
+✅ **UI redesign:**
+- Global dark minimal theme (`src/app.css`)
+- Restyled navigation and key pages
+- Premium landing page composition in `src/routes/+page.svelte`
 
 ✅ **Documentation:**
 - `PROJECT_STRUCTURE.md` - Full folder organization explained
 - This file - setup instructions
 
-## Next Steps to Complete Sprint 0
+✅ **Image assets:**
+- `static/images/` folder is active
+- Current landing uses `static/images/image1.webp` and `static/images/image2.webp`
 
-1. **Install dependencies** (run this in the `app` folder):
+## Local Setup
+
+1. **Install dependencies** (from `app`):
    ```bash
-   cd app
    npm install
    ```
 
-2. **Create remaining files** (I'll do this):
-   - Layout component (`src/routes/+layout.svelte`)
-   - Home page (`src/routes/+page.svelte`)
-   - Atomic components (Button, Card, etc.)
-   - Supabase client setup
-
-3. **Run the dev server**:
+2. **Run the dev server**:
    ```bash
    npm run dev
    ```
    Opens at http://localhost:5173
 
-4. **Deploy to Vercel** (after it works locally)
+3. **Build check**:
+   ```bash
+   npm run build
+   ```
+
+Note: On Windows + OneDrive, Vercel adapter symlink creation may fail (`EPERM`) during final adapter step even when app bundles compile successfully.
 
 ## How to Edit Content
 
-All text is in `src/lib/content/home.json`. Just edit the JSON and save - the page auto-updates!
+Landing text is in `src/lib/content/home.json`. Edit JSON and save - the page auto-updates.
 
 **Example:**
 ```json
@@ -58,6 +62,10 @@ All text is in `src/lib/content/home.json`. Just edit the JSON and save - the pa
 }
 ```
 
+Landing visual blocks currently use fixed image paths in `src/routes/+page.svelte`:
+- `/images/image1.webp`
+- `/images/image2.webp`
+
 ## Project Structure (Simplified)
 
 ```
@@ -67,10 +75,7 @@ app/
 │   │   ├── components/     ← Reusable UI pieces
 │   │   └── content/        ← TEXT & IMAGES (edit here!)
 │   └── routes/             ← Pages of your website
-├── static/                 ← Images, fonts, etc.
+├── static/
+│   └── images/             ← Homepage and UI image assets
 └── package.json            ← Dependencies
 ```
-
-## Ready to Continue?
-
-Say "continue" and I'll create the remaining components and pages!

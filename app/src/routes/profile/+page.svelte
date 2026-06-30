@@ -18,19 +18,75 @@
     
     user = session.user;
     
-    // Get user profile
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-    
-    if (data) {
-      profile = data;
-    }
+    profile = await getOrCreateProfile();
     
     loading = false;
   });
+
+  async function getOrCreateProfile() {
+    const { data: existingProfile, error: existingProfileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (existingProfileError) {
+      throw existingProfileError;
+    }
+
+    if (existingProfile) {
+      return existingProfile;
+    }
+
+    const meta = user?.user_metadata || {};
+    const baseUsername = buildUsername(meta?.username);
+
+    let profilePayload = {
+      id: user.id,
+      username: baseUsername,
+      city: meta?.city || 'trieste',
+      age: Number(meta?.age ?? 25),
+      gender: meta?.gender || 'male',
+      experience_level: meta?.experience_level || 'beginner',
+      training_days_per_week: Number(meta?.training_days_per_week ?? 3),
+      training_goal: meta?.training_goal || 'general'
+    };
+
+    let { data: createdProfile, error: createProfileError } = await supabase
+      .from('profiles')
+      .insert(profilePayload)
+      .select('*')
+      .single();
+
+    if (createProfileError && createProfileError.code === '23505') {
+      profilePayload = {
+        ...profilePayload,
+        username: `${baseUsername}_${String(user.id).slice(0, 6)}`
+      };
+
+      const retry = await supabase
+        .from('profiles')
+        .insert(profilePayload)
+        .select('*')
+        .single();
+
+      createdProfile = retry.data;
+      createProfileError = retry.error;
+    }
+
+    if (createProfileError || !createdProfile) {
+      throw createProfileError || new Error('Unable to create profile for this account.');
+    }
+
+    return createdProfile;
+  }
+
+  function buildUsername(rawUsername) {
+    const fallbackFromEmail = user?.email ? user.email.split('@')[0] : '';
+    const candidate = String(rawUsername || fallbackFromEmail || `user_${String(user.id).slice(0, 8)}`);
+
+    return candidate.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 30) || `user_${String(user.id).slice(0, 8)}`;
+  }
 </script>
 
 <div class="min-h-screen bg-neutral-950 py-12 px-4">

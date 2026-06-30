@@ -2,7 +2,7 @@
   "hero": {
     "title": "Find Your Spot. Follow Your Plan. Climb the Ranks.",
     "subtitle": "The hyper-local platform for outdoor athletes in Trieste and Milan",
-    "cta_primary": "Get Started",
+    "cta_primary": "Generate My Plan",
     "cta_secondary": "Explore Spots",
     "image": "/images/hero-athlete.jpg"
   },
@@ -43,7 +43,7 @@
   },
   "cta_final": {
     "title": "Ready to Start Training?",
-    "subtitle": "Join the community of outdoor athletes",
-    "button": "Sign Up Free"
+    "subtitle": "Get a personalized plan in seconds — no account needed",
+    "button": "Generate a Free Plan"
   }
 }

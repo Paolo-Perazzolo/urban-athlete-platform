@@ -1,134 +1,209 @@
 <script>
   import { onMount } from 'svelte';
   import { supabase } from '$lib/utils/supabase';
-  import { goto } from '$app/navigation';
   import { generateTrainingPlan } from '$lib/utils/trainingPlanGenerator';
   
-  let user = null;
+  const STORAGE_KEY = 'ua_plan_history';
+  const SETTINGS_KEY = 'ua_plan_settings';
+
   let plan = null;
-  let loading = true;
+  let planHistory = [];
+  let loading = false;
   let generating = false;
   let error = '';
+  let showForm = true;
+  let exercises = [];
+
+  // Form fields
+  let age = 25;
+  let gender = 'male';
+  let experienceLevel = 'beginner';
+  let trainingDaysPerWeek = 3;
+  let trainingGoal = 'general';
+  let selectedIntensity = 'medium';
 
   onMount(async () => {
-    // Check authentication
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      goto('/auth/login');
-      return;
-    }
-    user = session.user;
-    
-    // Load user's most recent plan
-    await loadPlan();
+    restoreSession();
+    await loadExercises();
   });
 
-  async function loadPlan() {
+  function restoreSession() {
+    try {
+      const savedSettings = sessionStorage.getItem(SETTINGS_KEY);
+      if (savedSettings) {
+        const s = JSON.parse(savedSettings);
+        age = s.age ?? age;
+        gender = s.gender ?? gender;
+        experienceLevel = s.experience_level ?? experienceLevel;
+        trainingDaysPerWeek = s.training_days_per_week ?? trainingDaysPerWeek;
+        trainingGoal = s.training_goal ?? trainingGoal;
+        selectedIntensity = s.intensity ?? selectedIntensity;
+      }
+
+      const savedHistory = sessionStorage.getItem(STORAGE_KEY);
+      if (savedHistory) {
+        planHistory = JSON.parse(savedHistory);
+        if (planHistory.length > 0) {
+          plan = planHistory[0];
+          showForm = false;
+        }
+      }
+    } catch (_) { /* ignore corrupt storage */ }
+  }
+
+  function saveToSession() {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(planHistory));
+      sessionStorage.setItem(SETTINGS_KEY, JSON.stringify({
+        age, gender, experience_level: experienceLevel,
+        training_days_per_week: trainingDaysPerWeek,
+        training_goal: trainingGoal, intensity: selectedIntensity
+      }));
+    } catch (_) { /* storage full or unavailable */ }
+  }
+
+  async function loadExercises() {
     loading = true;
     const { data, error: loadError } = await supabase
-      .from('training_plans')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    
-    if (loadError) {
-      error = loadError.message;
-    } else if (data) {
-      plan = data;
+      .from('exercises')
+      .select('*');
+
+    if (loadError || !data || data.length === 0) {
+      error = loadError?.message || 'No exercises found in database.';
+    } else {
+      exercises = data;
     }
     loading = false;
   }
 
-  async function generateNewPlan() {
+  function generateNewPlan() {
     generating = true;
     error = '';
-    
+
     try {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+      const profile = {
+        age: Number(age),
+        gender,
+        experience_level: experienceLevel,
+        training_days_per_week: Number(trainingDaysPerWeek),
+        training_goal: trainingGoal
+      };
 
-      if (profileError || !profile) {
-        error = profileError?.message || 'Profile not found. Complete signup first.';
-        return;
-      }
+      const generatedPlan = generateTrainingPlan(
+        profile,
+        ['pull_up_bar', 'parallel_bars', 'bench', 'ground'],
+        exercises,
+        { intensity: selectedIntensity }
+      );
 
-      const { data: exercises, error: exercisesError } = await supabase
-        .from('exercises')
-        .select('*');
+      const entry = {
+        plan_data: generatedPlan,
+        created_at: new Date().toISOString()
+      };
 
-      if (exercisesError || !exercises) {
-        error = exercisesError?.message || 'Failed to load exercises';
-        return;
-      }
-
-      const generatedPlan = generateTrainingPlan(profile, ['pull_up_bar', 'parallel_bars', 'bench', 'ground'], exercises);
-
-      const { data: savedPlan, error: saveError } = await supabase
-        .from('training_plans')
-        .insert({
-          user_id: user.id,
-          plan_data: generatedPlan,
-          equipment_available: ['pull_up_bar', 'parallel_bars', 'bench', 'ground']
-        })
-        .select()
-        .single();
-
-      if (saveError) {
-        error = `Plan generated but not saved: ${saveError.message}`;
-        plan = { plan_data: generatedPlan };
-      } else {
-        plan = savedPlan;
-      }
+      planHistory = [entry, ...planHistory].slice(0, 10);
+      plan = entry;
+      showForm = false;
+      saveToSession();
     } catch (err) {
       error = err.message;
     } finally {
       generating = false;
     }
   }
+
+  function viewPlan(index) {
+    plan = planHistory[index];
+    showForm = false;
+  }
+
+  function editSettings() {
+    showForm = true;
+  }
 </script>
 
 <div class="min-h-screen bg-neutral-950 py-12 px-4">
   <div class="max-w-5xl mx-auto">
     <div class="mb-8">
-      <h1 class="text-4xl font-bold text-neutral-100 mb-2">Your Training Plan</h1>
-      <p class="text-neutral-400">Personalized workout program based on your goals and available equipment</p>
+      <h1 class="text-4xl font-bold text-neutral-100 mb-2">Training Plan Generator</h1>
+      <p class="text-neutral-400">Get a personalized workout — no account needed</p>
     </div>
 
     {#if loading}
       <div class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-300"></div>
-        <p class="mt-4 text-neutral-400">Loading your plan...</p>
+        <p class="mt-4 text-neutral-400">Loading exercises...</p>
       </div>
     {:else if error}
-      <div class="card p-8 bg-neutral-900 border border-red-900">
+      <div class="card p-8 bg-neutral-900 border border-red-900 mb-6">
         <p class="text-red-300 font-medium">{error}</p>
       </div>
-    {:else if !plan}
-      <div class="card p-12 text-center">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-neutral-950 border border-neutral-800 rounded-sm mb-6">
-          <svg class="w-10 h-10 text-neutral-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-        </div>
-        <h2 class="text-2xl font-bold text-neutral-100 mb-4">No Training Plan Yet</h2>
-        <p class="text-neutral-400 mb-8 max-w-2xl mx-auto">
-          Generate a personalized training plan based on your profile and available equipment.
-        </p>
-        <button
-          on:click={generateNewPlan}
-          disabled={generating}
-          class="btn btn-primary px-8 py-3"
-        >
-          {generating ? 'Generating...' : 'Generate My Plan'}
-        </button>
+    {/if}
+
+    <!-- Popup form -->
+    {#if showForm && !loading}
+      <div class="card max-w-lg mx-auto p-8">
+        <h2 class="text-2xl font-bold text-neutral-100 mb-2">Tell us about you</h2>
+        <p class="text-neutral-400 text-sm mb-6">Fill in your details to generate a custom training plan.</p>
+
+        <form on:submit|preventDefault={generateNewPlan} class="space-y-5">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="age" class="block text-sm font-medium text-neutral-300 mb-1">Age</label>
+              <input id="age" type="number" bind:value={age} min="13" max="90" required class="input w-full" />
+            </div>
+            <div>
+              <label for="gender" class="block text-sm font-medium text-neutral-300 mb-1">Gender</label>
+              <select id="gender" bind:value={gender} class="input w-full">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="experience" class="block text-sm font-medium text-neutral-300 mb-1">Experience Level</label>
+            <select id="experience" bind:value={experienceLevel} class="input w-full">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="days" class="block text-sm font-medium text-neutral-300 mb-1">Days / Week</label>
+              <input id="days" type="number" bind:value={trainingDaysPerWeek} min="1" max="7" required class="input w-full" />
+            </div>
+            <div>
+              <label for="intensity" class="block text-sm font-medium text-neutral-300 mb-1">Intensity</label>
+              <select id="intensity" bind:value={selectedIntensity} class="input w-full">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="goal" class="block text-sm font-medium text-neutral-300 mb-1">Training Goal</label>
+            <select id="goal" bind:value={trainingGoal} class="input w-full">
+              <option value="general">General Fitness</option>
+              <option value="strength">Strength</option>
+              <option value="endurance">Endurance</option>
+              <option value="skills">Skills</option>
+            </select>
+          </div>
+
+          <button type="submit" disabled={generating || exercises.length === 0} class="btn btn-primary w-full py-3 mt-2">
+            {generating ? 'Generating...' : 'Generate My Plan'}
+          </button>
+        </form>
       </div>
-    {:else}
-      <!-- Display the plan -->
+
+    <!-- Plan display -->
+    {:else if plan}
       <div class="space-y-6">
         <!-- Plan Header -->
         <div class="card p-6">
@@ -136,25 +211,24 @@
             <div>
               <h2 class="text-2xl font-bold text-neutral-100">{plan.plan_data.plan_name}</h2>
               <p class="text-neutral-400 mt-1">
-                {plan.plan_data.weeks} weeks • {plan.plan_data.days_per_week} days per week
+                {plan.plan_data.weeks} weeks · {plan.plan_data.days_per_week} days per week
+              </p>
+              <p class="text-neutral-500 text-sm mt-1 capitalize">
+                Intensity: {plan.plan_data.intensity || 'medium'}
               </p>
             </div>
-            <button
-              on:click={generateNewPlan}
-              disabled={generating}
-              class="btn btn-accent"
-            >
-              {generating ? 'Generating...' : 'Regenerate'}
+            <button on:click={editSettings} class="btn btn-accent">
+              Change Settings
             </button>
           </div>
-          
+
           <!-- Plan Notes -->
           {#if plan.plan_data.notes && plan.plan_data.notes.length > 0}
             <div class="bg-neutral-950 border border-neutral-800 rounded-sm p-4 mt-4">
               <h3 class="font-semibold text-neutral-100 mb-2">Training Notes</h3>
               <ul class="space-y-1 text-sm text-neutral-300">
                 {#each plan.plan_data.notes as note}
-                  <li>• {note}</li>
+                  <li>· {note}</li>
                 {/each}
               </ul>
             </div>
@@ -177,7 +251,7 @@
                   <div class="flex-1">
                     <h4 class="font-semibold text-neutral-100">{exercise.name}</h4>
                     <p class="text-sm text-neutral-400 mt-1">
-                      {exercise.sets} sets × {exercise.reps} reps • Rest: {exercise.rest_seconds}s
+                      {exercise.sets} sets × {exercise.reps} reps · Rest: {exercise.rest_seconds}s
                     </p>
                     {#if exercise.tips}
                       <p class="text-sm text-neutral-500 mt-2 italic">{exercise.tips}</p>
@@ -188,6 +262,33 @@
             </div>
           </div>
         {/each}
+
+        <!-- Plan History -->
+        {#if planHistory.length > 1}
+          <div class="card p-6 mt-6">
+            <h3 class="text-lg font-bold text-neutral-100 mb-4">Previous Plans (this session)</h3>
+            <div class="space-y-2">
+              {#each planHistory as entry, i}
+                <button
+                  on:click={() => viewPlan(i)}
+                  class="w-full text-left p-3 rounded-sm border transition-colors {plan === entry
+                    ? 'border-neutral-100 bg-neutral-900'
+                    : 'border-neutral-800 bg-neutral-950 hover:border-neutral-600'}"
+                >
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium text-neutral-100">{entry.plan_data.plan_name}</span>
+                    <span class="text-xs text-neutral-500">
+                      {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <p class="text-xs text-neutral-400 mt-1">
+                    {entry.plan_data.days_per_week}d/wk · {entry.plan_data.intensity || 'medium'} intensity
+                  </p>
+                </button>
+              {/each}
+            </div>
+          </div>
+        {/if}
       </div>
     {/if}
   </div>

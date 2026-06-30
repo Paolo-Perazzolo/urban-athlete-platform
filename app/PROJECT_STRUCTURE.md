@@ -12,27 +12,25 @@ app/
 │   │   │   ├── organisms/       # Complex components (Nav, SpotCard, LeaderboardRow)
 │   │   │   └── layout/          # Layout components (Header, Footer, Container)
 │   │   ├── content/             # Content files (JSON)
-│   │   │   ├── home.json        # Landing page content
-│   │   │   ├── spots.json       # Spots page content
-│   │   │   └── about.json       # About page content
-│   │   ├── stores/              # Svelte stores (global state)
-│   │   │   ├── auth.js          # Authentication state
-│   │   │   └── user.js          # User profile state
+│   │   │   └── home.json        # Landing page text content
 │   │   └── utils/               # Utility functions
 │   │       ├── supabase.js      # Supabase client
-│   │       └── helpers.js       # Helper functions
+│   │       └── trainingPlanGenerator.js # Deterministic training plan logic
 │   ├── routes/                  # Pages (file-based routing)
 │   │   ├── +layout.svelte       # Root layout (wraps all pages)
 │   │   ├── +page.svelte         # Home page (/)
 │   │   ├── spots/               # Spots section
-│   │   │   ├── +page.svelte     # Spots list (/spots)
-│   │   │   └── [id]/            # Individual spot
-│   │   │       └── +page.svelte # Spot detail (/spots/123)
+│   │   │   └── +page.svelte     # Spots placeholder (/spots)
 │   │   ├── auth/                # Authentication pages
 │   │   │   ├── login/
 │   │   │   └── signup/
-│   │   └── profile/             # User profile
-│   │       └── +page.svelte
+│   │   ├── profile/             # User profile
+│   │   │   └── +page.svelte
+│   │   ├── plan/                # Training plan page
+│   │   │   └── +page.svelte
+│   │   └── api/
+│   │       └── generate-plan/
+│   │           └── +server.js   # Plan generation endpoint
 │   ├── app.html                 # HTML shell
 │   └── app.css                  # Global styles (Tailwind)
 ├── static/                      # Static assets
@@ -68,14 +66,11 @@ Edit JSON files in `src/lib/content/`:
 ```
 
 ### 2. Images
-Place images in `static/images/` and reference them in JSON:
-```json
-{
-  "hero": {
-    "image": "/images/hero-athlete.jpg"
-  }
-}
-```
+Place images in `static/images/`.
+
+Current landing visuals are referenced directly in `src/routes/+page.svelte`:
+- `/images/image1.webp`
+- `/images/image2.webp`
 
 ### 3. Styling
 - Colors: Edit `tailwind.config.js` → `theme.extend.colors`
@@ -102,9 +97,10 @@ Place images in `static/images/` and reference them in JSON:
 - LeaderboardRow (Avatar + Name + XP + Rank)
 
 ### Pages (organisms + layout)
-- Home (Hero + Features + CTA)
-- Spots (SearchBar + SpotCard list + Map)
-- Profile (Avatar + Stats + Settings)
+- Home (premium hero + features + city stats + CTA)
+- Spots (placeholder page)
+- Profile (user profile summary)
+- Plan (deterministic workout generation)
 
 ## How Components Work
 

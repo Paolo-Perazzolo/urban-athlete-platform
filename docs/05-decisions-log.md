@@ -14,3 +14,6 @@
 | 2025-06-25 | Notion workspace structure defined: 1 DB (Backlog) + 4 pages (Decisions, Ideas, Weekly Review, Sprint Board view) | 06 |
 | 2025-06-25 | Sprint 0 completed: SvelteKit app scaffold, atomic design components, content system (JSON), database schema, Revolut/Freeletics-inspired design | app/* |
 | 2025-06-25 | Corporate network blocks npm - will test/deploy from home network | — |
+| 2026-06-29 | UI direction updated to dark minimal style (mostly black, small radius, no gradients) across navigation and core pages | app/src/app.css, app/src/routes/* |
+| 2026-06-29 | Landing page refreshed to premium/dynamic composition using two static WebP assets | app/src/routes/+page.svelte, app/static/images/* |
+| 2026-06-29 | Training plan generator hardened for null profile fields to prevent runtime errors | app/src/lib/utils/trainingPlanGenerator.js |

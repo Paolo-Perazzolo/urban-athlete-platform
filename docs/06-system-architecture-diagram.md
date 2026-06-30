@@ -212,6 +212,53 @@ sequenceDiagram
     Browser-->>User: Display weekly workout
 ```
 
+### 4. Registration & Profile Creation Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant SvelteKit
+    participant SupabaseAuth as Supabase Auth (GoTrue)
+    participant AuthUsers as auth.users
+    participant Trigger as public.handle_new_user()
+    participant Profiles as public.profiles
+    participant RLS as RLS Policy Engine
+
+    User->>Browser: Submit signup form (email, password, profile fields)
+    Browser->>SvelteKit: signup(formData)
+    SvelteKit->>SupabaseAuth: auth.signUp({ email, password, options.data })
+
+    SupabaseAuth->>AuthUsers: INSERT new auth user + raw_user_meta_data
+    AuthUsers->>Trigger: AFTER INSERT trigger fires
+    Trigger->>Profiles: INSERT profile row (id = auth.users.id, mapped metadata)
+    Profiles->>RLS: Validate trigger write under SECURITY DEFINER context
+    RLS-->>Profiles: Allowed
+
+    SupabaseAuth-->>SvelteKit: Return session/user
+
+    opt Client-side profile sync/update (defensive)
+        SvelteKit->>Profiles: INSERT or UPDATE own profile fields
+        Profiles->>RLS: Check policy (auth.uid() = id)
+        alt Insert policy exists
+            RLS-->>Profiles: Allowed
+            Profiles-->>SvelteKit: Success
+        else Insert policy missing
+            RLS-->>Profiles: Denied
+            Profiles-->>SvelteKit: 403 Forbidden
+        end
+    end
+
+    SvelteKit-->>Browser: Signup result (success or error)
+    Browser-->>User: Redirect to app or show error
+```
+
+Expected behavior:
+- `auth.users` is the source of identity, and `public.profiles` stores app-specific user fields.
+- `public.handle_new_user()` should auto-create the profile row immediately after signup.
+- Client-side profile insert/update must pass RLS (`auth.uid() = id`) and needs explicit `INSERT` policy for inserts.
+- If `INSERT` policy is missing, profile writes return `403 Forbidden` even for authenticated users.
+
 ---
 
 ## Technology Stack

@@ -35,7 +35,7 @@
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 mb-10">
-          <a href="/auth/signup" class="btn btn-primary text-base md:text-lg px-8 py-4 text-center">
+          <a href="/plan" class="btn btn-primary text-base md:text-lg px-8 py-4 text-center">
             {content.hero.cta_primary}
           </a>
           <a href="/spots" class="btn btn-accent text-base md:text-lg px-8 py-4 text-center">
@@ -165,11 +165,11 @@
       {content.cta_final.subtitle}
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/auth/signup" class="btn btn-primary text-lg px-12 py-4 inline-block">
+      <a href="/plan" class="btn btn-primary text-lg px-12 py-4 inline-block">
         {content.cta_final.button}
       </a>
-      <a href="/plan" class="btn btn-accent text-lg px-12 py-4 inline-block">
-        View Sample Plan
+      <a href="/spots" class="btn btn-accent text-lg px-12 py-4 inline-block">
+        Explore Spots
       </a>
     </div>
   </div>
