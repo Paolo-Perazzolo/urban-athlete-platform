@@ -3,6 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+
 /* Custom base styles */
 @layer base {
 	/* Smooth scrolling */
@@ -14,11 +16,12 @@
 	body {
 		@apply bg-neutral-950 text-neutral-100;
 		@apply font-sans antialiased;
+		font-family: 'Roboto', sans-serif;
 	}
 
 	/* Headings */
 	h1, h2, h3, h4, h5, h6 {
-		@apply font-display font-bold;
+		@apply font-sans font-bold;
 	}
 }
 
