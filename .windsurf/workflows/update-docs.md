@@ -21,6 +21,7 @@ Run this workflow whenever a conversation includes a **decision** that changes:
    - `my-space/docs/03-market-analysis.md` — competitors, GTM
    - `my-space/docs/04-ai-agent-guide.md` — model usage, workflows
    - `my-space/docs/05-decisions-log.md` — append every decision here
+   - `my-space/docs/09-engineering-standards.md` — coding rules and delivery standards
 
 2. Read the affected doc(s) to understand current state.
 
@@ -32,3 +33,7 @@ Run this workflow whenever a conversation includes a **decision** that changes:
    - Which docs were updated
 
 5. Briefly confirm to the user what was updated.
+
+## Mandatory gate before push to `dev`
+
+Before pushing code to `dev`, verify docs are updated if behavior/architecture/process changed.

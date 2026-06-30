@@ -1,6 +1,7 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import { supabase } from '$lib/utils/supabase';
+  import 'leaflet/dist/leaflet.css';
 
   let spots = [];
   let filteredSpots = [];
@@ -13,8 +14,24 @@
   let galleryIndexes = {};
   let lightboxSpot = null;
   let lightboxIndex = 0;
+  let selectedSpot = null;
+  let mapContainer;
+  let mapInstance = null;
+  let markerLayer = null;
+  let L = null;
+
+  const DEFAULT_CENTER = [45.65, 13.77];
+  const DEFAULT_ZOOM = 8;
+
+  async function scheduleMapInvalidate() {
+    await tick();
+    mapInstance?.invalidateSize();
+  }
 
   onMount(async () => {
+    const leafletModule = await import('leaflet');
+    L = leafletModule.default;
+
     const { data, error: loadError } = await supabase
       .from('spots')
       .select('*')
@@ -44,6 +61,84 @@
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ');
   }
+
+  function escapeHtml(value) {
+    return String(value || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function getSpotLatLng(spot) {
+    const lat = Number(spot.latitude);
+    const lng = Number(spot.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return [lat, lng];
+  }
+
+  function ensureMapReady() {
+    if (mapInstance || !mapContainer || currentView !== 'map' || !L) return;
+
+    mapInstance = L.map(mapContainer, { zoomControl: true }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }).addTo(mapInstance);
+
+    markerLayer = L.layerGroup().addTo(mapInstance);
+    refreshMarkers();
+
+    setTimeout(() => {
+      mapInstance?.invalidateSize();
+    }, 0);
+  }
+
+  function refreshMarkers() {
+    if (!mapInstance || !markerLayer || !L) return;
+
+    markerLayer.clearLayers();
+    const bounds = [];
+
+    filteredSpots.forEach((spot) => {
+      const latLng = getSpotLatLng(spot);
+      if (!latLng) return;
+
+      bounds.push(latLng);
+
+      const marker = L.circleMarker(latLng, {
+        radius: 8,
+        color: '#000000',
+        weight: 2,
+        fillColor: '#ffd54a',
+        fillOpacity: 1
+      });
+
+      marker.on('click', () => {
+        openSpotSidebar(spot);
+      });
+
+      markerLayer.addLayer(marker);
+    });
+
+    if (bounds.length === 1) {
+      mapInstance.setView(bounds[0], 13);
+    } else if (bounds.length > 1) {
+      mapInstance.fitBounds(bounds, { padding: [30, 30] });
+    } else {
+      mapInstance.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+    }
+  }
+
+  onDestroy(() => {
+    if (mapInstance) {
+      mapInstance.remove();
+      mapInstance = null;
+      markerLayer = null;
+    }
+  });
 
   function getSpotKey(spot) {
     return spot.id || spot.name;
@@ -91,6 +186,14 @@
     lightboxSpot = null;
   }
 
+  function closeSpotSidebar() {
+    selectedSpot = null;
+  }
+
+  function openSpotSidebar(spot) {
+    selectedSpot = spot;
+  }
+
   function lightboxPrevious() {
     if (!lightboxSpot) return;
     const images = getSpotImages(lightboxSpot);
@@ -113,6 +216,20 @@
 
     return cityMatch && equipmentMatch;
   });
+
+  $: if (currentView === 'map' && mapContainer && L && !mapInstance) {
+    ensureMapReady();
+  }
+
+  $: if (currentView === 'map' && mapInstance) {
+    filteredSpots;
+    refreshMarkers();
+    scheduleMapInvalidate();
+  }
+
+  $: if (selectedSpot && !filteredSpots.some((spot) => (spot.id || spot.name) === (selectedSpot.id || selectedSpot.name))) {
+    selectedSpot = null;
+  }
 </script>
 
 <div class="min-h-screen bg-neutral-950 py-12 px-4">
@@ -192,9 +309,77 @@
         <p class="text-red-300 font-medium">{error}</p>
       </div>
     {:else if currentView === 'map'}
-      <div class="card p-12 text-center">
-        <h2 class="text-2xl font-bold text-neutral-100 mb-3">Map View Coming Next</h2>
-        <p class="text-neutral-400">Map container is ready. In the next step we will render spots on an interactive map.</p>
+      <div class="card p-0 overflow-hidden">
+        <div class="relative h-[560px]">
+          {#if selectedSpot}
+            <aside class="absolute left-0 top-0 bottom-0 w-full sm:w-[360px] z-[1000] pointer-events-auto bg-neutral-900 border-r border-neutral-800 overflow-y-auto">
+              <div class="p-4 border-b border-neutral-800 flex items-center justify-between">
+                <h3 class="text-neutral-100 font-semibold">Spot Details</h3>
+                <button
+                  on:click={closeSpotSidebar}
+                  class="text-neutral-400 hover:text-neutral-100"
+                  aria-label="Close spot details"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div class="p-4">
+                <h4 class="text-xl font-bold text-neutral-100 mb-1">{selectedSpot.name}</h4>
+                <p class="text-xs uppercase tracking-[0.12em] text-neutral-500 mb-4">{selectedSpot.city}</p>
+
+                <div class="relative mb-4">
+                  <button
+                    on:click={() => openLightbox(selectedSpot)}
+                    class="w-full aspect-video rounded-sm border border-neutral-800 bg-neutral-950 text-neutral-300 flex items-center justify-center"
+                  >
+                    <span class="text-xs">{getSpotImages(selectedSpot)[getCurrentImageIndex(selectedSpot)].label}</span>
+                  </button>
+
+                  <button
+                    on:click={() => previousImage(selectedSpot)}
+                    class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-sm border border-neutral-700 bg-neutral-950/90 text-neutral-100 hover:border-neutral-500"
+                    aria-label="Previous image"
+                  >
+                    ←
+                  </button>
+                  <button
+                    on:click={() => nextImage(selectedSpot)}
+                    class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-sm border border-neutral-700 bg-neutral-950/90 text-neutral-100 hover:border-neutral-500"
+                    aria-label="Next image"
+                  >
+                    →
+                  </button>
+                </div>
+
+                <p class="text-sm text-neutral-400 mb-4">
+                  {selectedSpot.description || 'No description available.'}
+                </p>
+
+                <div class="flex items-center justify-between text-sm mb-4">
+                  <span class="text-neutral-300">⭐ {selectedSpot.avg_rating ?? 0}</span>
+                  <span class="text-neutral-500">{selectedSpot.review_count ?? 0} reviews</span>
+                </div>
+
+                {#if selectedSpot.equipment?.length}
+                  <div class="flex flex-wrap gap-2">
+                    {#each selectedSpot.equipment as item}
+                      <span class="px-2 py-1 text-xs rounded-sm bg-neutral-950 border border-neutral-800 text-neutral-300">
+                        {formatEquipmentLabel(item)}
+                      </span>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            </aside>
+          {/if}
+
+          <div class="absolute inset-0 z-0" bind:this={mapContainer}></div>
+        </div>
+
+        {#if filteredSpots.length === 0}
+          <p class="text-sm text-neutral-500 p-3">No spots match the current filters.</p>
+        {/if}
       </div>
     {:else if filteredSpots.length === 0}
       <div class="card p-10 text-center">
