@@ -2,6 +2,8 @@
 
 Modern web platform for outdoor calisthenics athletes in Trieste and Milan.
 
+Current app scope is no-auth: plan generation and spots discovery work without login/profile flows.
+
 ## 🚀 Quick Start (From Home Network)
 
 ```bash
@@ -126,4 +128,4 @@ Done! Your app is live in ~2 minutes.
 - [ ] Run database migration in Supabase
 - [ ] Test locally
 - [ ] Deploy to Vercel
-- [ ] Add more pages (spots list, auth, profile)
+- [ ] Add more pages (spots details, leaderboard, content pages)

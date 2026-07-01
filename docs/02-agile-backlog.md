@@ -10,7 +10,7 @@
 | # | Epic | Priority | Sprint Target |
 |---|---|---|---|
 | E1 | Project Setup & Infrastructure | P0 | Sprint 0 |
-| E2 | Authentication & User Profiles | P0 | Sprint 1 |
+| E2 | Authentication & User Profiles | Deferred | Post-MVP |
 | E3 | Training Spots (CRUD + Map) | P0 | Sprint 1-2 |
 | E4 | Photos & Reviews | P1 | Sprint 2 |
 | E5 | Analytics Instrumentation | P0 | Sprint 0-1 |
@@ -38,18 +38,18 @@
 
 ---
 
-## Sprint 1 — Auth + Spots List (Week 2)
+## Sprint 1 — Spots List (Current Scope)
 
-**Goal:** Users can sign up, log in, and see a list of training spots on a map
+**Goal:** Users can see a list of training spots on a map (no-auth phase)
 
 | ID | Story | Points | Acceptance Criteria |
 |---|---|---|---|
-| S1-1 | User registration (email + Google OAuth) | 3 | User can sign up and receives confirmation |
-| S1-2 | User login + session management | 2 | User stays logged in, JWT in cookie |
-| S1-3 | Profile creation flow (username, city selection) | 2 | After first login, user selects Trieste or Milan |
+| S1-1 | User registration (email + Google OAuth) | — | Deferred to post-MVP |
+| S1-2 | User login + session management | — | Deferred to post-MVP |
+| S1-3 | Profile creation flow (username, city selection) | — | Deferred to post-MVP |
 | S1-4 | Training spots map view (Leaflet + OSM) | 3 | Map centered on user's city showing spot markers |
 | S1-5 | Spot detail page (name, description, equipment) | 2 | Click marker → see spot details |
-| S1-6 | Track auth events in PostHog | 1 | signup, login, profile_created events firing |
+| S1-6 | Track auth events in PostHog | — | Deferred to post-MVP |
 
 **Total:** 13 points
 

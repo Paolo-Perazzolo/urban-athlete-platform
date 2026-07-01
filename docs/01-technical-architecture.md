@@ -90,6 +90,16 @@ If Vercel Preview/Development environments are enabled, keep them mapped to the 
 2. Test SQL changes carefully before applying to the live project.
 3. Avoid ad-hoc SQL changes that are not captured in migration files.
 
+### Product Scope Note (Current Phase)
+
+Authentication and profile UX are temporarily out of scope.
+
+Current live scope focuses on:
+- Spots discovery
+- Deterministic training plan generation
+
+Auth/profile flows and related UI will be reintroduced in a later phase.
+
 ## 3. Data Model
 
 ```sql
@@ -263,11 +273,9 @@ Keep it simple — add more events later based on what questions you need answer
 
 ## 7. Auth Flow
 
-```
-Visit site → Sign up (email or Google) → Pick username + city → Done
-```
+Auth is currently disabled in the active product scope.
 
-Supabase Auth handles everything: JWT, sessions, password reset, OAuth.
+When reintroduced, Supabase Auth will handle JWT, sessions, password reset, and OAuth.
 
 ## 8. What You DON'T Need Yet
 

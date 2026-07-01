@@ -1,368 +1,130 @@
-/**
- * TRAINING PLAN GENERATOR
- * 
- * Deterministic algorithm to generate personalized workout plans
- * based on user profile and available equipment at a training spot.
- * 
- * NO AI API CALLS - Pure logic-based selection
- */
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
 
-/**
- * Generate a weekly training plan
- * @param {Object} userProfile - User data from profiles table
- * @param {Array} availableEquipment - Equipment at the selected spot
- * @param {Array} exercises - All exercises from database
- * @param {Object} options - Plan generation options
- * @param {string} options.intensity - low, medium, high
- * @returns {Object} Weekly training plan with workouts
- */
-export function generateTrainingPlan(userProfile, availableEquipment, exercises, options = {}) {
-  const experience_level = userProfile?.experience_level ?? 'beginner';
-  const training_days_per_week = userProfile?.training_days_per_week ?? 3;
-  const training_goal = userProfile?.training_goal ?? 'general';
-  const age = Number(userProfile?.age ?? 25);
-  const intensity = normalizeIntensity(options?.intensity);
-  const effectiveIntensity = getAgeAdjustedIntensity(intensity, age);
-  const planSeed = buildPlanSeed(userProfile, availableEquipment, effectiveIntensity);
-
-  // Map experience level to difficulty range
-  const difficultyRange = getDifficultyRange(experience_level);
-  
-  // Filter exercises by difficulty and equipment
-  const suitableExercises = filterExercises(exercises, difficultyRange, availableEquipment);
-  
-  // Group exercises by type (push, pull, legs, core)
-  const exercisesByType = groupExercisesByType(suitableExercises);
-  
-  // Generate workout days based on training frequency
-  const workoutDays = generateWorkoutDays(
-    training_days_per_week,
-    training_goal,
-    exercisesByType,
-    planSeed,
-    effectiveIntensity,
-    age
-  );
-  
+function normalizeProfile(profile = {}) {
   return {
-    plan_name: `${capitalize(experience_level)} ${capitalize(training_goal)} Plan`,
-    weeks: 4, // 4-week program
-    days_per_week: training_days_per_week,
-    intensity: effectiveIntensity,
-    workouts: workoutDays,
-    notes: generatePlanNotes(experience_level, training_goal, effectiveIntensity, age)
+    age: Number(profile.age ?? 25),
+    experienceLevel: profile.experience_level ?? 'beginner',
+    trainingDaysPerWeek: clamp(Number(profile.training_days_per_week ?? 3), 1, 7),
+    trainingGoal: profile.training_goal ?? 'general'
   };
 }
 
-/**
- * Map experience level to difficulty range (1-4)
- */
-function getDifficultyRange(experienceLevel) {
-  const ranges = {
-    beginner: [1, 2],      // Difficulty 1-2
-    intermediate: [2, 3],  // Difficulty 2-3
-    advanced: [3, 4]       // Difficulty 3-4
-  };
-  return ranges[experienceLevel] || [1, 2];
+function getDifficultyCap(experienceLevel) {
+  if (experienceLevel === 'advanced') return 4;
+  if (experienceLevel === 'intermediate') return 3;
+  return 2;
 }
 
-/**
- * Filter exercises by difficulty and available equipment
- */
-function filterExercises(exercises, difficultyRange, availableEquipment) {
-  return exercises.filter(ex => {
-    // Check difficulty
-    const inDifficultyRange = ex.difficulty >= difficultyRange[0] && 
-                               ex.difficulty <= difficultyRange[1];
-    
-    // Check equipment (exercise needs no equipment OR equipment is available)
-    const hasEquipment = ex.equipment_needed.length === 0 || 
-                         ex.equipment_needed.some(eq => availableEquipment.includes(eq));
-    
-    return inDifficultyRange && hasEquipment;
-  });
+function getLoadMultiplier(intensity, age) {
+  const base = intensity === 'high' ? 1.12 : intensity === 'low' ? 0.9 : 1;
+  if (age >= 50) return base * 0.88;
+  if (age >= 40) return base * 0.94;
+  return base;
 }
 
-/**
- * Group exercises by muscle groups into workout types
- */
-function groupExercisesByType(exercises) {
-  const groups = {
-    push: [],    // Chest, shoulders, triceps
-    pull: [],    // Back, biceps
-    legs: [],    // Quads, glutes, hamstrings
-    core: []     // Abs, obliques
-  };
-  
-  exercises.forEach(ex => {
-    const muscles = ex.muscle_groups || [];
-    
-    if (muscles.some(m => ['chest', 'shoulders', 'triceps'].includes(m))) {
-      groups.push.push(ex);
-    }
-    if (muscles.some(m => ['back', 'biceps', 'lats'].includes(m))) {
-      groups.pull.push(ex);
-    }
-    if (muscles.some(m => ['quads', 'glutes', 'hamstrings'].includes(m))) {
-      groups.legs.push(ex);
-    }
-    if (muscles.some(m => ['core', 'abs', 'obliques'].includes(m))) {
-      groups.core.push(ex);
-    }
-  });
-  
-  return groups;
+function getRestMultiplier(intensity, age) {
+  const base = intensity === 'high' ? 0.9 : intensity === 'low' ? 1.15 : 1;
+  if (age >= 50) return base * 1.2;
+  if (age >= 40) return base * 1.1;
+  return base;
 }
 
-/**
- * Generate workout days based on frequency and goal
- */
-function generateWorkoutDays(daysPerWeek, goal, exercisesByType, planSeed, effectiveIntensity, age) {
+function matchesEquipment(exercise = {}, availableEquipment = []) {
+  const needed = Array.isArray(exercise.equipment_needed) ? exercise.equipment_needed : [];
+  if (needed.length === 0) return true;
+  return needed.every((eq) => availableEquipment.includes(eq));
+}
+
+function adjustReps(defaultReps, loadMultiplier) {
+  if (!defaultReps || typeof defaultReps !== 'string') return '8-12';
+
+  if (defaultReps.includes('s')) {
+    const n = Number(defaultReps.replace(/[^0-9]/g, '') || 30);
+    const adjusted = clamp(Math.round(n * (2 - loadMultiplier)), 10, 120);
+    return `${adjusted}s`;
+  }
+
+  const range = defaultReps.match(/(\d+)\s*-\s*(\d+)/);
+  if (range) {
+    const min = clamp(Math.round(Number(range[1]) * loadMultiplier), 1, 50);
+    const max = clamp(Math.round(Number(range[2]) * loadMultiplier), min, 60);
+    return `${min}-${max}`;
+  }
+
+  const single = defaultReps.match(/\d+/);
+  if (!single) return defaultReps;
+  return String(clamp(Math.round(Number(single[0]) * loadMultiplier), 1, 60));
+}
+
+function categorizeExercise(exercise = {}) {
+  const groups = Array.isArray(exercise.muscle_groups) ? exercise.muscle_groups : [];
+  const g = groups.join('|');
+  if (g.includes('back') || g.includes('biceps')) return 'pull';
+  if (g.includes('chest') || g.includes('triceps') || g.includes('shoulders')) return 'push';
+  if (g.includes('quads') || g.includes('glutes') || g.includes('hamstrings')) return 'legs';
+  return 'core';
+}
+
+function pickExercises(pool, category, count) {
+  const inCategory = pool.filter((e) => categorizeExercise(e) === category);
+  const source = inCategory.length >= count ? inCategory : pool;
+  return source.slice(0, count);
+}
+
+export function generateTrainingPlan(profile, availableEquipment = [], exercises = [], options = {}) {
+  const p = normalizeProfile(profile);
+  const intensity = options.intensity ?? 'medium';
+  const difficultyCap = getDifficultyCap(p.experienceLevel);
+  const loadMultiplier = getLoadMultiplier(intensity, p.age);
+  const restMultiplier = getRestMultiplier(intensity, p.age);
+
+  const usable = (Array.isArray(exercises) ? exercises : [])
+    .filter((e) => Number(e.difficulty ?? 1) <= difficultyCap)
+    .filter((e) => matchesEquipment(e, availableEquipment))
+    .sort((a, b) => String(a.name ?? '').localeCompare(String(b.name ?? '')));
+
+  if (usable.length === 0) {
+    throw new Error('No compatible exercises found for your profile and available equipment.');
+  }
+
+  const dayTemplates = ['push', 'pull', 'legs', 'core'];
   const workouts = [];
-  
-  if (daysPerWeek === 3) {
-    // 3-day split: Push, Pull, Legs
-    workouts.push(createWorkout('Push Day', exercisesByType.push, exercisesByType.core, goal, `${planSeed}|push_day`, effectiveIntensity, age));
-    workouts.push(createWorkout('Pull Day', exercisesByType.pull, exercisesByType.core, goal, `${planSeed}|pull_day`, effectiveIntensity, age));
-    workouts.push(createWorkout('Leg Day', exercisesByType.legs, exercisesByType.core, goal, `${planSeed}|leg_day`, effectiveIntensity, age));
-  } else if (daysPerWeek === 4) {
-    // 4-day split: Upper, Lower, Upper, Lower
-    const upper = [...exercisesByType.push, ...exercisesByType.pull];
-    workouts.push(createWorkout('Upper Body A', upper, exercisesByType.core, goal, `${planSeed}|upper_a`, effectiveIntensity, age));
-    workouts.push(createWorkout('Lower Body A', exercisesByType.legs, exercisesByType.core, goal, `${planSeed}|lower_a`, effectiveIntensity, age));
-    workouts.push(createWorkout('Upper Body B', upper, exercisesByType.core, goal, `${planSeed}|upper_b`, effectiveIntensity, age));
-    workouts.push(createWorkout('Lower Body B', exercisesByType.legs, exercisesByType.core, goal, `${planSeed}|lower_b`, effectiveIntensity, age));
-  } else if (daysPerWeek === 5) {
-    // 5-day split: Push, Pull, Legs, Push, Pull
-    workouts.push(createWorkout('Push A', exercisesByType.push, exercisesByType.core, goal, `${planSeed}|push_a`, effectiveIntensity, age));
-    workouts.push(createWorkout('Pull A', exercisesByType.pull, exercisesByType.core, goal, `${planSeed}|pull_a`, effectiveIntensity, age));
-    workouts.push(createWorkout('Legs', exercisesByType.legs, exercisesByType.core, goal, `${planSeed}|legs`, effectiveIntensity, age));
-    workouts.push(createWorkout('Push B', exercisesByType.push, exercisesByType.core, goal, `${planSeed}|push_b`, effectiveIntensity, age));
-    workouts.push(createWorkout('Pull B', exercisesByType.pull, exercisesByType.core, goal, `${planSeed}|pull_b`, effectiveIntensity, age));
-  } else {
-    // Default: Full body
-    const allExercises = [
-      ...exercisesByType.push,
-      ...exercisesByType.pull,
-      ...exercisesByType.legs
-    ];
-    workouts.push(createWorkout('Full Body', allExercises, exercisesByType.core, goal, `${planSeed}|full_body`, effectiveIntensity, age));
-  }
-  
-  return workouts;
-}
 
-/**
- * Create a single workout with exercises
- */
-function createWorkout(name, mainExercises, coreExercises, goal, workoutSeed, effectiveIntensity, age) {
-  const exercises = [];
-  
-  // Select 3-4 main exercises
-  const selectedMain = selectExercises(mainExercises, goal === 'strength' ? 3 : 4, `${workoutSeed}|main`);
-  exercises.push(...selectedMain);
-  
-  // Add 1-2 core exercises
-  const selectedCore = selectExercises(coreExercises, 2, `${workoutSeed}|core`);
-  exercises.push(...selectedCore);
-  
-  return {
-    name,
-    exercises: exercises.map(ex => {
-      const prescription = adjustPrescriptionByIntensityAndAge(ex, effectiveIntensity, age);
+  for (let day = 0; day < p.trainingDaysPerWeek; day += 1) {
+    const focus = dayTemplates[day % dayTemplates.length];
+    const selected = pickExercises(usable, focus, 4);
 
-      return {
-        exercise_id: ex.id,
-        name: ex.name,
-        name_it: ex.name_it,
-        sets: prescription.sets,
-        reps: prescription.reps,
-        rest_seconds: prescription.rest_seconds,
-        tips: ex.tips
-      };
-    })
-  };
-}
+    workouts.push({
+      name: `${focus[0].toUpperCase()}${focus.slice(1)} Focus`,
+      exercises: selected.map((e) => {
+        const defaultSets = Number(e.default_sets ?? 3);
+        const rest = Number(e.default_rest_seconds ?? 90);
+        const adjustedSets = clamp(Math.round(defaultSets * (loadMultiplier >= 1.05 ? 1.1 : loadMultiplier <= 0.92 ? 0.9 : 1)), 2, 6);
+        const adjustedRest = clamp(Math.round(rest * restMultiplier), 30, 240);
 
-/**
- * Select N exercises, avoiding duplicates
- */
-function selectExercises(exercises, count, seed) {
-  const ranked = [...exercises].sort((a, b) => {
-    const scoreA = hashString(`${seed}|${exerciseKey(a)}`);
-    const scoreB = hashString(`${seed}|${exerciseKey(b)}`);
-
-    if (scoreA !== scoreB) {
-      return scoreA - scoreB;
-    }
-
-    return exerciseKey(a).localeCompare(exerciseKey(b));
-  });
-
-  return ranked.slice(0, Math.min(count, exercises.length));
-}
-
-/**
- * Build a deterministic seed from plan inputs
- */
-function buildPlanSeed(userProfile, availableEquipment, effectiveIntensity) {
-  const userId = userProfile?.id ?? 'anonymous';
-  const level = userProfile?.experience_level ?? 'beginner';
-  const goal = userProfile?.training_goal ?? 'general';
-  const days = userProfile?.training_days_per_week ?? 3;
-  const age = Number(userProfile?.age ?? 25);
-  const equipment = [...(availableEquipment || [])].sort().join(',');
-
-  return `${userId}|${level}|${goal}|${days}|${age}|${effectiveIntensity}|${equipment}`;
-}
-
-/**
- * Stable identifier for deterministic ordering
- */
-function exerciseKey(exercise) {
-  return String(exercise?.id ?? exercise?.name ?? 'unknown_exercise');
-}
-
-/**
- * Deterministic string hash (djb2 variant)
- */
-function hashString(value) {
-  let hash = 5381;
-
-  for (let i = 0; i < value.length; i += 1) {
-    hash = ((hash << 5) + hash) + value.charCodeAt(i);
-    hash = hash >>> 0;
-  }
-
-  return hash;
-}
-
-/**
- * Generate plan notes based on experience and goal
- */
-function generatePlanNotes(experienceLevel, goal, effectiveIntensity, age) {
-  const notes = [];
-  
-  if (experienceLevel === 'beginner') {
-    notes.push('Focus on form over speed. Take your time with each rep.');
-    notes.push('Rest 90-120 seconds between sets.');
-    notes.push('If an exercise is too hard, use the progression from easier variation.');
-  } else if (experienceLevel === 'intermediate') {
-    notes.push('Challenge yourself but maintain good form.');
-    notes.push('Rest 60-90 seconds between sets.');
-    notes.push('Try to increase reps or difficulty each week.');
-  } else {
-    notes.push('Push your limits while staying safe.');
-    notes.push('Rest 45-75 seconds between sets.');
-    notes.push('Consider adding weight or progressing to harder variations.');
-  }
-  
-  if (goal === 'strength') {
-    notes.push('Goal: Strength - Focus on lower reps (5-8) with maximum effort.');
-  } else if (goal === 'endurance') {
-    notes.push('Goal: Endurance - Aim for higher reps (15-20) with shorter rest.');
-  } else if (goal === 'skills') {
-    notes.push('Goal: Skills - Practice technique and control. Quality over quantity.');
-  }
-
-  notes.push(`Selected intensity: ${capitalize(effectiveIntensity)}.`);
-
-  if (age >= 50) {
-    notes.push('Age adjustment applied: extra recovery and conservative volume for safer progression.');
-  }
-  
-  return notes;
-}
-
-function normalizeIntensity(intensity) {
-  if (intensity === 'low' || intensity === 'high') {
-    return intensity;
-  }
-
-  return 'medium';
-}
-
-function getAgeAdjustedIntensity(intensity, age) {
-  if (!Number.isFinite(age)) {
-    return intensity;
-  }
-
-  if (age >= 50 && intensity === 'high') {
-    return 'medium';
-  }
-
-  if (age >= 60 && intensity === 'medium') {
-    return 'low';
-  }
-
-  return intensity;
-}
-
-function adjustPrescriptionByIntensityAndAge(exercise, effectiveIntensity, age) {
-  const baseSets = Number(exercise?.default_sets ?? 3);
-  const baseRest = Number(exercise?.default_rest_seconds ?? 60);
-  const baseReps = String(exercise?.default_reps ?? '8-12');
-
-  let setDelta = 0;
-  let restMultiplier = 1;
-  let reps = baseReps;
-
-  if (effectiveIntensity === 'low') {
-    setDelta = -1;
-    restMultiplier = 1.2;
-    reps = reduceRepRange(baseReps);
-  } else if (effectiveIntensity === 'high') {
-    setDelta = 1;
-    restMultiplier = 0.9;
-    reps = increaseRepRange(baseReps);
-  }
-
-  if (age >= 50) {
-    restMultiplier = Math.max(restMultiplier, 1.15);
-    setDelta = Math.min(setDelta, 0);
+        return {
+          name: e.name ?? 'Exercise',
+          sets: adjustedSets,
+          reps: adjustReps(e.default_reps ?? '8-12', loadMultiplier),
+          rest_seconds: adjustedRest,
+          tips: e.tips ?? ''
+        };
+      })
+    });
   }
 
   return {
-    sets: Math.max(2, baseSets + setDelta),
-    reps,
-    rest_seconds: Math.max(30, Math.round(baseRest * restMultiplier))
+    plan_name: `${p.trainingGoal[0].toUpperCase()}${p.trainingGoal.slice(1)} Plan`,
+    weeks: 4,
+    days_per_week: p.trainingDaysPerWeek,
+    intensity,
+    notes: [
+      `Difficulty cap based on level: ${difficultyCap}`,
+      `Age-aware adjustments applied for age ${p.age}`,
+      'Same inputs always generate the same plan'
+    ],
+    workouts
   };
-}
-
-function reduceRepRange(repsText) {
-  return shiftRepRange(repsText, -2);
-}
-
-function increaseRepRange(repsText) {
-  return shiftRepRange(repsText, 2);
-}
-
-function shiftRepRange(repsText, delta) {
-  if (typeof repsText !== 'string') {
-    return repsText;
-  }
-
-  const trimmed = repsText.trim();
-  const rangeMatch = trimmed.match(/^(\d+)\s*-\s*(\d+)$/);
-
-  if (rangeMatch) {
-    const start = Math.max(1, Number(rangeMatch[1]) + delta);
-    const end = Math.max(start, Number(rangeMatch[2]) + delta);
-    return `${start}-${end}`;
-  }
-
-  const singleMatch = trimmed.match(/^(\d+)$/);
-  if (singleMatch) {
-    return String(Math.max(1, Number(singleMatch[1]) + delta));
-  }
-
-  return repsText;
-}
-
-/**
- * Capitalize first letter
- */
-function capitalize(str) {
-  if (!str || typeof str !== 'string') return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }

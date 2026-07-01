@@ -10,8 +10,7 @@
 - `postcss.config.js` - CSS processing
 
 ✅ **App features shipped:**
-- Supabase authentication (login/signup)
-- Profile page integration
+- No-auth user flow for training plan and spots browsing
 - Spots page placeholder
 - Deterministic training plan generation flow
 
