@@ -10,6 +10,7 @@
   let selectedCity = 'all';
   let selectedEquipment = [];
   let currentView = 'list';
+  let showFilters = false;
   let availableEquipment = [];
   let galleryIndexes = {};
   let lightboxSpot = null;
@@ -20,6 +21,8 @@
   let markerLayer = null;
   let L = null;
 
+  const FILTERS_KEY = 'ua_spots_filters';
+
   const DEFAULT_CENTER = [45.65, 13.77];
   const DEFAULT_ZOOM = 8;
 
@@ -29,6 +32,8 @@
   }
 
   onMount(async () => {
+    restoreFilters();
+
     const leafletModule = await import('leaflet');
     L = leafletModule.default;
 
@@ -42,10 +47,40 @@
     } else {
       spots = data || [];
       availableEquipment = [...new Set(spots.flatMap((spot) => spot.equipment || []))].sort();
+      selectedEquipment = selectedEquipment.filter((equipment) => availableEquipment.includes(equipment));
     }
 
     loading = false;
   });
+
+  function restoreFilters() {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const savedFilters = sessionStorage.getItem(FILTERS_KEY);
+      if (!savedFilters) return;
+
+      const parsed = JSON.parse(savedFilters);
+      selectedCity = parsed.selectedCity ?? selectedCity;
+      selectedEquipment = Array.isArray(parsed.selectedEquipment) ? parsed.selectedEquipment : selectedEquipment;
+      currentView = parsed.currentView ?? currentView;
+    } catch (_) {
+      // Ignore invalid session payload
+    }
+  }
+
+  function saveFilters() {
+    if (typeof window === 'undefined') return;
+
+    try {
+      sessionStorage.setItem(
+        FILTERS_KEY,
+        JSON.stringify({ selectedCity, selectedEquipment, currentView })
+      );
+    } catch (_) {
+      // Ignore storage issues
+    }
+  }
 
   function toggleEquipment(equipment) {
     if (selectedEquipment.includes(equipment)) {
@@ -194,6 +229,10 @@
     selectedSpot = spot;
   }
 
+  function closeFilters() {
+    showFilters = false;
+  }
+
   function lightboxPrevious() {
     if (!lightboxSpot) return;
     const images = getSpotImages(lightboxSpot);
@@ -216,6 +255,8 @@
 
     return cityMatch && equipmentMatch;
   });
+
+  $: saveFilters();
 
   $: if (currentView === 'map' && mapContainer && L && !mapInstance) {
     ensureMapReady();
@@ -240,7 +281,7 @@
     </div>
 
     <div class="card p-5 mb-4 space-y-5">
-      <div class="grid md:grid-cols-1 gap-4">
+      <div class="grid gap-4">
         <div>
           <label for="city-filter" class="block text-sm font-medium text-neutral-300 mb-2">City</label>
           <select id="city-filter" bind:value={selectedCity} class="input w-full">
@@ -251,7 +292,21 @@
         </div>
       </div>
 
-      <div>
+      <div class="flex items-center justify-between gap-3 md:hidden">
+        <div>
+          <p class="text-sm font-medium text-neutral-200">Equipment Filters</p>
+          <p class="text-xs text-neutral-500">
+            {selectedEquipment.length === 0
+              ? 'No equipment filter selected'
+              : `${selectedEquipment.length} selected`}
+          </p>
+        </div>
+        <button on:click={() => (showFilters = true)} class="btn btn-accent min-h-[44px]">
+          Edit Filters
+        </button>
+      </div>
+
+      <div class="hidden md:block">
         <p class="block text-sm font-medium text-neutral-300 mb-2">Equipment Filter</p>
         <div class="flex flex-wrap gap-2">
           {#if availableEquipment.length === 0}
@@ -260,7 +315,7 @@
             {#each availableEquipment as equipment}
               <button
                 on:click={() => toggleEquipment(equipment)}
-                class="px-3 py-1 text-xs rounded-sm border transition-colors {selectedEquipment.includes(equipment)
+                class="px-3 py-2 min-h-[44px] text-sm rounded-sm border transition-colors {selectedEquipment.includes(equipment)
                   ? 'border-neutral-100 bg-neutral-900 text-neutral-100'
                   : 'border-neutral-700 bg-neutral-950 text-neutral-300 hover:border-neutral-500'}"
               >
@@ -298,6 +353,60 @@
         </button>
       </div>
     </div>
+
+    {#if showFilters}
+      <div class="fixed inset-0 z-50 md:hidden">
+        <button
+          type="button"
+          class="absolute inset-0 bg-black/70"
+          aria-label="Close filters"
+          on:click={closeFilters}
+        ></button>
+
+        <div class="absolute inset-x-0 bottom-0 rounded-t-2xl border border-neutral-800 bg-neutral-900 p-5 max-h-[78vh] overflow-y-auto">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-neutral-100">Equipment Filters</h2>
+            <button
+              on:click={closeFilters}
+              class="h-10 w-10 rounded-sm border border-neutral-700 text-neutral-300 hover:text-neutral-100"
+              aria-label="Close filters"
+            >
+              ✕
+            </button>
+          </div>
+
+          {#if availableEquipment.length === 0}
+            <span class="text-sm text-neutral-500">No equipment tags found.</span>
+          {:else}
+            <div class="flex flex-wrap gap-2">
+              {#each availableEquipment as equipment}
+                <button
+                  on:click={() => toggleEquipment(equipment)}
+                  class="px-3 py-2 min-h-[44px] text-sm rounded-sm border transition-colors {selectedEquipment.includes(equipment)
+                    ? 'border-neutral-100 bg-neutral-950 text-neutral-100'
+                    : 'border-neutral-700 bg-neutral-900 text-neutral-300 hover:border-neutral-500'}"
+                >
+                  {formatEquipmentLabel(equipment)}
+                </button>
+              {/each}
+            </div>
+          {/if}
+
+          <div class="mt-6 flex gap-3">
+            <button
+              on:click={() => (selectedEquipment = [])}
+              class="btn btn-accent flex-1 min-h-[44px]"
+              disabled={selectedEquipment.length === 0}
+            >
+              Clear
+            </button>
+            <button on:click={closeFilters} class="btn btn-primary flex-1 min-h-[44px]">
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    {/if}
 
     {#if loading}
       <div class="text-center py-12">

@@ -40,6 +40,7 @@
 	/* Button base styles */
 	.btn {
 		@apply px-6 py-3 rounded-sm font-semibold;
+		@apply min-h-[44px];
 		@apply transition-all duration-200;
 		@apply focus:outline-none focus:ring-1 focus:ring-offset-0;
 	}
@@ -58,11 +59,26 @@
 
 	/* Input base styles */
 	.input {
-		@apply w-full px-4 py-3 rounded-sm;
+		@apply w-full px-4 py-3 rounded-sm min-h-[44px];
 		@apply border border-neutral-800 bg-neutral-950 text-neutral-100;
 		@apply placeholder:text-neutral-500;
 		@apply focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-neutral-600;
 		@apply transition-all duration-200;
+	}
+
+	.mobile-bottom-nav {
+		@apply fixed inset-x-0 bottom-0 z-40 flex items-center justify-around;
+		@apply border-t border-neutral-800 bg-neutral-950/95 backdrop-blur px-2 py-2;
+		padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+	}
+
+	.mobile-bottom-nav-item {
+		@apply flex-1 text-center text-xs font-medium text-neutral-400 px-3 py-2 rounded-sm transition-colors;
+		@apply min-h-[44px] flex items-center justify-center;
+	}
+
+	.mobile-bottom-nav-item-active {
+		@apply bg-neutral-900 text-neutral-100;
 	}
 }
 

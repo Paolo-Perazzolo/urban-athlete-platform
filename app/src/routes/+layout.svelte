@@ -6,20 +6,55 @@
 
 <script>
   import '../app.css';
+  import { page } from '$app/stores';
+
+  const navItems = [
+    { href: '/', label: 'Home' },
+    { href: '/spots', label: 'Spots' },
+    { href: '/plan', label: 'Plan' }
+  ];
+
+  function isActive(pathname, href) {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  }
 </script>
 
 <header class="border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
   <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
     <a href="/" class="text-sm font-semibold tracking-wide text-neutral-100">Urban Athlete</a>
-    <div class="flex items-center gap-4 text-sm text-neutral-300">
-      <a href="/spots" class="hover:text-neutral-100">Spots</a>
-      <a href="/plan" class="hover:text-neutral-100">Plan</a>
+    <div class="hidden md:flex items-center gap-4 text-sm">
+      {#each navItems as item}
+        <a
+          href={item.href}
+          class="{isActive($page.url.pathname, item.href)
+            ? 'text-neutral-100 font-semibold'
+            : 'text-neutral-300 hover:text-neutral-100'}"
+        >
+          {item.label}
+        </a>
+      {/each}
     </div>
   </nav>
 </header>
+
+<nav class="mobile-bottom-nav md:hidden" aria-label="Primary">
+  {#each navItems as item}
+    <a
+      href={item.href}
+      class="mobile-bottom-nav-item {isActive($page.url.pathname, item.href)
+        ? 'mobile-bottom-nav-item-active'
+        : ''}"
+    >
+      {item.label}
+    </a>
+  {/each}
+</nav>
 
 <!-- 
   <slot /> is where page content appears
   Think of it as a placeholder for each page
 -->
-<slot />
+<main class="pb-24 md:pb-0">
+  <slot />
+</main>
