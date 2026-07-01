@@ -61,9 +61,9 @@
 
 | ID | Story | Points | Acceptance Criteria |
 |---|---|---|---|
-| S2-1 | "Add new spot" form (name, location picker, equipment) | 3 | Logged-in user can submit a new spot |
+| S2-1 | "Add new spot" form (name, location picker, equipment) | 3 | Visitor can submit a new spot |
 | S2-2 | Photo upload for spots (max 5, client-side compression) | 5 | Photos compressed to WebP, stored in Supabase Storage |
-| S2-3 | Star rating + review for spots | 3 | User can rate 1-5 stars and leave comment |
+| S2-3 | Star rating + review for spots | 3 | Visitor can rate 1-5 stars and leave comment |
 | S2-4 | Spot list view (card layout, filterable by city) | 2 | Alternative to map: scrollable card list |
 | S2-5 | Track content events in PostHog | 1 | spot_added, photo_uploaded, review_submitted events |
 
@@ -78,7 +78,7 @@
 | ID | Story | Points | Acceptance Criteria |
 |---|---|---|---|
 | S3-1 | XP engine: award XP for actions | 3 | XP granted for review (+10), photo (+15), check-in (+20), workout (+30) |
-| S3-2 | User profile shows level + XP bar | 2 | Profile page displays current level, XP, progress to next level |
+| S3-2 | User profile shows level + XP bar | — | Deferred to post-MVP auth/profile phase |
 | S3-3 | City leaderboard page | 3 | Top 20 users per city, sortable by XP |
 | S3-4 | Streak tracking (consecutive days with activity) | 3 | Calendar view of training days, streak counter |
 | S3-5 | Basic badge system (5 initial badges) | 2 | "First Review", "Explorer" (3 spots), "Streak 7", etc. |
@@ -113,7 +113,7 @@
 | S5-1 | Seed 10 spots in Trieste with photos | 3 | Real spots with descriptions, equipment, photos |
 | S5-2 | Seed 10 spots in Milan with photos | 3 | Real spots with descriptions, equipment, photos |
 | S5-3 | PWA manifest + service worker | 2 | App installable on mobile, offline spot cache |
-| S5-4 | Landing page with value proposition | 3 | Hero section, features, CTA to sign up |
+| S5-4 | Landing page with value proposition | 3 | Hero section, features, CTA to explore spots/plan |
 | S5-5 | SEO basics (meta tags, OG images, sitemap) | 2 | Shareable on social media with preview |
 | S5-6 | Build analytics dashboards in PostHog | 2 | Acquisition funnel, retention, city comparison |
 | S5-7 | Bug fixes and performance optimization | 3 | Lighthouse score > 85, no critical bugs |

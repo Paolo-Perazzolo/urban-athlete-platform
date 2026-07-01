@@ -23,7 +23,16 @@ This creates all core tables: profiles, spots, reviews, exercises, training_plan
 3. Copy/paste the contents of `seed/exercises_seed.sql`
 4. Click **Run**
 
-This adds 15 foundational calisthenics exercises with full metadata.
+This adds 20 calisthenics exercises with full metadata.
+
+## Step 3 (Optional): Seed Baseline Spots
+
+1. In the same SQL Editor
+2. Click **New Query**
+3. Copy/paste the contents of `seed/spots_seed.sql`
+4. Click **Run**
+
+This seeds a baseline of real-world spots for Trieste and Milan and skips duplicates by `(name, city)`.
 
 ## SQL Safety Rules
 
@@ -48,18 +57,29 @@ FROM exercises
 ORDER BY difficulty, name;
 ```
 
-You should see 15 exercises sorted by difficulty level.
+You should see 20 exercises sorted by difficulty level.
 
 Run this verification after each migration/seed update.
+
+Run this query to verify spot seed coverage:
+
+```sql
+SELECT city, COUNT(*) AS spots_count
+FROM spots
+GROUP BY city
+ORDER BY city;
+```
+
+Target baseline for launch prep: at least 10 spots per city.
 
 ## Exercise Database Summary
 
 | Difficulty | Count | Examples |
 |---|---|---|
-| 1 (Beginner) | 4 | Incline Push-Ups, Australian Pull-Ups, Bodyweight Squats, Plank |
-| 2 (Intermediate) | 7 | Standard Push-Ups, Pull-Ups, Pike Push-Ups, Dips, Bulgarian Split Squats |
-| 3 (Advanced) | 2 | Diamond Push-Ups, Hanging Leg Raises |
-| 4 (Elite) | 2 | Weighted Pull-Ups, Pistol Squats, L-Sit |
+| 1 (Beginner) | 6 | Incline Push-Ups, Australian Pull-Ups, Bodyweight Squats, Plank, Negative Pull-Ups, Glute Bridge |
+| 2 (Intermediate) | 8 | Standard Push-Ups, Pull-Ups, Pike Push-Ups, Dips, Bulgarian Split Squats, Ring Rows |
+| 3 (Advanced) | 3 | Diamond Push-Ups, Hanging Leg Raises, Archer Push-Ups |
+| 4 (Elite) | 3 | Weighted Pull-Ups, Pistol Squats, L-Sit |
 
 ## Progression Chains
 

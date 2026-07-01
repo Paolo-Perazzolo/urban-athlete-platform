@@ -261,13 +261,15 @@ Key events to track:
 
 | Event | Why |
 |---|---|
-| `user_signed_up` | Acquisition |
+| `session_started` | Acquisition in no-auth phase |
 | `spot_viewed` | Are people using the map? |
 | `spot_added` | Are users contributing content? |
 | `review_submitted` | Content quality signal |
 | `plan_generated` | Is the training feature useful? |
 | `workout_completed` | Retention signal |
 | `leaderboard_viewed` | Is gamification working? |
+
+Auth-specific events (`signup`, `login`, `profile_created`) are deferred until auth/profile flows return.
 
 Keep it simple — add more events later based on what questions you need answered.
 

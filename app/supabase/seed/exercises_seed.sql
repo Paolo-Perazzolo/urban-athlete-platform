@@ -1,5 +1,5 @@
 -- EXERCISE DATABASE SEED
--- 15 foundational calisthenics exercises with full metadata
+-- 20 calisthenics exercises with full metadata
 -- Run this after the initial schema migration
 
 -- ============================================================================
@@ -361,20 +361,139 @@ INSERT INTO exercises (
 );
 
 -- ============================================================================
+-- ADDITIONAL FOUNDATION EXERCISES (PHASE 2)
+-- ============================================================================
+
+-- 16. NEGATIVE PULL-UPS (Beginner)
+INSERT INTO exercises (
+  name, name_it, description,
+  muscle_groups, equipment_needed, difficulty,
+  exercise_type, default_sets, default_reps, default_rest_seconds,
+  tips
+)
+SELECT
+  'Negative Pull-Ups',
+  'Trazioni Negative',
+  'Start at the top position and lower slowly to build pull-up strength safely.',
+  ARRAY['back', 'biceps', 'forearms'],
+  ARRAY['pull_up_bar'],
+  1,
+  'strength',
+  3,
+  '4-8',
+  120,
+  'Use a box to reach the top. Lower under control for 3-5 seconds each rep.'
+WHERE NOT EXISTS (
+  SELECT 1 FROM exercises WHERE name = 'Negative Pull-Ups'
+);
+
+-- 17. ARCHER PUSH-UPS (Advanced)
+INSERT INTO exercises (
+  name, name_it, description,
+  muscle_groups, equipment_needed, difficulty,
+  exercise_type, default_sets, default_reps, default_rest_seconds,
+  tips
+)
+SELECT
+  'Archer Push-Ups',
+  'Piegamenti Arciere',
+  'Unilateral-biased push-up variation for strength progression toward one-arm push-ups.',
+  ARRAY['chest', 'triceps', 'shoulders', 'core'],
+  ARRAY[]::TEXT[],
+  3,
+  'strength',
+  3,
+  '5-8 per side',
+  105,
+  'Keep one arm bent and the other extended. Shift body weight with control side-to-side.'
+WHERE NOT EXISTS (
+  SELECT 1 FROM exercises WHERE name = 'Archer Push-Ups'
+);
+
+-- 18. GLUTE BRIDGE (Beginner)
+INSERT INTO exercises (
+  name, name_it, description,
+  muscle_groups, equipment_needed, difficulty,
+  exercise_type, default_sets, default_reps, default_rest_seconds,
+  tips
+)
+SELECT
+  'Glute Bridge',
+  'Ponte Glutei',
+  'Floor-based posterior-chain exercise to build glute strength and hip stability.',
+  ARRAY['glutes', 'hamstrings', 'core'],
+  ARRAY[]::TEXT[],
+  1,
+  'strength',
+  3,
+  '12-20',
+  60,
+  'Push through heels and squeeze glutes at the top. Avoid overextending the lower back.'
+WHERE NOT EXISTS (
+  SELECT 1 FROM exercises WHERE name = 'Glute Bridge'
+);
+
+-- 19. HOLLOW BODY HOLD (Intermediate)
+INSERT INTO exercises (
+  name, name_it, description,
+  muscle_groups, equipment_needed, difficulty,
+  exercise_type, default_sets, default_reps, default_rest_seconds,
+  tips
+)
+SELECT
+  'Hollow Body Hold',
+  'Hollow Hold',
+  'Gymnastics-inspired core hold that improves trunk tension and bodyline control.',
+  ARRAY['core', 'hip_flexors'],
+  ARRAY[]::TEXT[],
+  2,
+  'endurance',
+  3,
+  '20-45s',
+  60,
+  'Press lower back into the floor. Keep ribs down and maintain full-body tension.'
+WHERE NOT EXISTS (
+  SELECT 1 FROM exercises WHERE name = 'Hollow Body Hold'
+);
+
+-- 20. RING ROWS (Intermediate)
+INSERT INTO exercises (
+  name, name_it, description,
+  muscle_groups, equipment_needed, difficulty,
+  exercise_type, default_sets, default_reps, default_rest_seconds,
+  tips
+)
+SELECT
+  'Ring Rows',
+  'Rematore agli Anelli',
+  'Horizontal pulling movement using rings with scalable angle and grip options.',
+  ARRAY['back', 'biceps', 'rear_shoulders', 'core'],
+  ARRAY['rings'],
+  2,
+  'strength',
+  3,
+  '8-12',
+  90,
+  'Keep shoulders down and chest open. Adjust body angle to control difficulty.'
+WHERE NOT EXISTS (
+  SELECT 1 FROM exercises WHERE name = 'Ring Rows'
+);
+
+-- ============================================================================
 -- SUMMARY
 -- ============================================================================
--- Total: 15 exercises
+-- Total: 20 exercises
 -- Difficulty distribution:
---   Level 1 (Beginner): 4 exercises
---   Level 2 (Intermediate): 7 exercises
---   Level 3 (Advanced): 2 exercises
---   Level 4 (Elite): 2 exercises
+--   Level 1 (Beginner): 6 exercises
+--   Level 2 (Intermediate): 9 exercises
+--   Level 3 (Advanced): 3 exercises
+--   Level 4 (Elite): 3 exercises
 -- 
 -- Equipment needed:
---   No equipment: 6 exercises
---   Pull-up bar: 5 exercises
+--   No equipment: 9 exercises
+--   Pull-up bar: 6 exercises
 --   Parallel bars/dip station: 2 exercises
---   Low bar/rings: 2 exercises
+--   Low bar/rings: 4 exercises
 --   Bench: 2 exercises
 --   Weight belt: 1 exercise
 --

@@ -20,6 +20,8 @@ A free, hyper-local web platform for outdoor/calisthenics athletes to discover t
 | [Decisions Log](docs/05-decisions-log.md) | Running log of all strategic/technical decisions | ✅ Active |
 | [Notion Setup](docs/06-notion-setup.md) | Notion workspace structure and daily workflow | ✅ Ready |
 | [System Architecture](docs/06-system-architecture-diagram.md) | Architecture diagrams, data flows, tech stack | ✅ Complete |
+| [Technical Improvement Backlog](docs/10-technical-improvement-backlog.md) | Prioritized non-feature technical hardening backlog | ✅ Active |
+| [Product Improvement Backlog](docs/11-product-improvement-backlog.md) | Prioritized user-facing product improvements | ✅ Active |
 
 ## 🚀 Current Status
 
@@ -29,12 +31,11 @@ A free, hyper-local web platform for outdoor/calisthenics athletes to discover t
 - Design system + landing page
 - Full documentation
 
-**Next: Sprint 1**
-1. **Deploy to Vercel** — get the app live
-2. **Authentication** — login/signup with Supabase Auth
-3. **Navigation** — header, footer, mobile menu
-4. **Spots map** — Leaflet + OpenStreetMap integration
-5. **Add spot form** — let users contribute locations
+**Current phase: No-auth MVP hardening**
+1. **Stabilize spots + plan UX** — loading/error/empty states and edge-case handling
+2. **Seed real spots data** — Trieste + Milan baseline content
+3. **Add lightweight analytics events** — `spot_viewed`, `plan_generated`, `plan_generation_failed`
+4. **Launch readiness checks** — smoke tests before each promotion from `dev` to `main`
 
 ## 💰 Cost Summary
 

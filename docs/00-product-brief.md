@@ -65,11 +65,10 @@ A free, hyper-local platform that combines:
 ## 5. MVP Scope (MoSCoW)
 
 ### Must Have (POC — Sprint 0-2)
-- [ ] User registration/login (email + social)
 - [ ] Training spot listing (Trieste + Milan) with map view
 - [ ] Add/view spot photos (max 3-5 per spot to control costs)
 - [ ] Spot ratings and short reviews
-- [ ] Basic user profile (city, level, XP)
+- [ ] Anonymous/no-auth plan generation flow
 - [ ] Analytics instrumentation (page views, actions, funnels)
 
 ### Should Have (Sprint 3-4)
@@ -87,6 +86,7 @@ A free, hyper-local platform that combines:
 - [ ] Spot "check-in" with optional GPS verification
 
 ### Won't Have (for now)
+- User registration/login and profile UX (deferred to post-MVP)
 - Native mobile app (PWA instead)
 - Video uploads
 - Real-time chat
@@ -97,7 +97,7 @@ A free, hyper-local platform that combines:
 
 | Metric | Target (3 months) | Tool |
 |---|---|---|
-| Registered users | 100+ | Auth system |
+| Unique visitors | 100+ | Analytics |
 | Training spots listed | 20+ (10 per city) | Database |
 | Weekly active users (WAU) | 30+ | Analytics |
 | Avg. session duration | > 2 min | Analytics |
