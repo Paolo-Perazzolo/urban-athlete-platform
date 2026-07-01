@@ -21,9 +21,15 @@
 </script>
 
 <header class="border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
-  <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-    <a href="/" class="text-sm font-semibold tracking-wide text-neutral-100">Urban Athlete</a>
-    <div class="hidden md:flex items-center gap-4 text-sm">
+  <nav class="mx-auto flex max-w-6xl items-center justify-center md:justify-between px-4 py-3">
+    <a href="/" class="inline-flex items-center transition-opacity hover:opacity-90">
+      <img
+        src="/images/logo1.png"
+        alt="Urban Athlete"
+        class="h-[60px] w-auto md:h-[66px]"
+      />
+    </a>
+    <div class="hidden md:flex items-center gap-5 text-base">
       {#each navItems as item}
         <a
           href={item.href}
