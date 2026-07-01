@@ -1,14 +1,20 @@
 # Supabase Database Setup
 
+## Environment Strategy (Current, Simplified)
+
+For now, use one Supabase project (`main`) shared by both Git branches (`dev` and `main`).
+
+This reduces setup complexity for the first deployment phase. A dedicated dev/prod split can be introduced later.
+
 ## Step 1: Run Initial Schema
 
-1. Go to your Supabase project: https://supabase.com/dashboard/project/uidvrhthkeqxwytangnt
+1. Go to your Supabase project dashboard (`main`)
 2. Click **SQL Editor** in the left sidebar
 3. Click **New Query**
 4. Copy/paste the contents of `migrations/001_initial_schema.sql`
 5. Click **Run** (or press Cmd/Ctrl + Enter)
 
-This creates all tables: profiles, spots, reviews, exercises, training_plans, xp_events.
+This creates all core tables: profiles, spots, reviews, exercises, training_plans, xp_events.
 
 ## Step 2: Seed Exercise Database
 
@@ -18,6 +24,12 @@ This creates all tables: profiles, spots, reviews, exercises, training_plans, xp
 4. Click **Run**
 
 This adds 15 foundational calisthenics exercises with full metadata.
+
+## SQL Safety Rules
+
+1. Treat SQL files in `app/supabase/migrations` as source of truth.
+2. Avoid ad-hoc SQL changes not captured in migration files.
+3. Before applying risky SQL, take a backup/export snapshot from Supabase.
 
 ## Verify It Worked
 
@@ -37,6 +49,8 @@ ORDER BY difficulty, name;
 ```
 
 You should see 15 exercises sorted by difficulty level.
+
+Run this verification after each migration/seed update.
 
 ## Exercise Database Summary
 

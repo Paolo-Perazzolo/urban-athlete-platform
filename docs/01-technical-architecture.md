@@ -64,6 +64,32 @@ That's it. Three services total: **Vercel + Supabase + PostHog.**
 
 No edge functions, no separate email service, no CI/CD pipeline needed for POC. Vercel auto-deploys when you push to GitHub.
 
+### Environment Strategy (Current, Simplified)
+
+For the first deploy phase, use a single Supabase project (`main`) for both Git branches:
+
+| Git branch | Vercel behavior | Supabase project | Purpose |
+|---|---|---|---|
+| `dev` | Not auto-deployed to production | `main` | Development and testing |
+| `main` | Auto-deployed to production | `main` | Live release |
+
+This keeps setup simple while the platform is still early-stage. Environment separation can be introduced later.
+
+#### Environment variables
+
+Use the same values for:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+If Vercel Preview/Development environments are enabled, keep them mapped to the same Supabase project for now.
+
+#### SQL safety rule
+
+1. Keep SQL files in `app/supabase/migrations` as source of truth.
+2. Test SQL changes carefully before applying to the live project.
+3. Avoid ad-hoc SQL changes that are not captured in migration files.
+
 ## 3. Data Model
 
 ```sql

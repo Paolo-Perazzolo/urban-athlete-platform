@@ -35,8 +35,7 @@ git commit -m "Add feature X"
 git push origin dev
 ```
 
-**Vercel will automatically create a preview deployment** for every push to `dev`.
-You'll get a URL like: `urban-athlete-dev-abc123.vercel.app`
+`dev` is your working branch for daily development and validation.
 
 ### 3. Ready to Deploy to Production?
 ```bash
@@ -106,13 +105,11 @@ Vercel will redeploy the previous version.
 
 ---
 
-## Vercel Preview URLs
+## Vercel Deployment Mode (Current)
 
-Every push to `dev` gets a unique preview URL:
-- Check GitHub commit → Vercel bot comment
-- Or go to Vercel dashboard → Deployments
+For now, Vercel production deploy is tied to `main` only.
 
-Test your changes there before merging to `main`.
+Use local testing (`npm run dev` / `npm run build`) before merging `dev` into `main`.
 
 ---
 
@@ -129,4 +126,4 @@ Test your changes there before merging to `main`.
 
 - ✅ `dev` branch created
 - ✅ `main` branch is production-ready
-- 🔜 Connect Vercel to auto-deploy both branches
+- 🔜 Keep evaluating if preview deploys on `dev` should be enabled later

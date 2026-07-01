@@ -381,13 +381,12 @@ All tables have RLS enabled with specific policies:
 ```mermaid
 graph LR
     DEV[dev branch<br/>Daily work] -->|git push| GH_DEV[GitHub dev]
-    GH_DEV -->|Auto-deploy| VERCEL_DEV[Vercel Preview<br/>urban-athlete-dev.vercel.app]
-    
+
     DEV -->|git merge| MAIN[main branch<br/>Production-ready]
     MAIN -->|git push| GH_MAIN[GitHub main]
     GH_MAIN -->|Auto-deploy| VERCEL_PROD[Vercel Production<br/>urbanathlete.com]
-    
-    VERCEL_DEV -.->|Test| DEV
+
+    GH_DEV -.->|Local/manual test only| DEV
     VERCEL_PROD -->|Live| USERS[Users]
 
     style DEV fill:#ffa500

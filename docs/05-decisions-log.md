@@ -18,3 +18,4 @@
 | 2026-06-29 | Landing page refreshed to premium/dynamic composition using two static WebP assets | app/src/routes/+page.svelte, app/static/images/* |
 | 2026-06-29 | Training plan generator hardened for null profile fields to prevent runtime errors | app/src/lib/utils/trainingPlanGenerator.js |
 | 2026-06-30 | Project moved to no-auth UX for plan and spots; added engineering standards and docs gate before dev push; implemented spots map view with dark style, lucid-gold pins, and marker-driven left sidebar details | docs/09-engineering-standards.md, .windsurf/workflows/update-docs.md, app/src/routes/spots/+page.svelte, app/src/app.css |
+| 2026-07-01 | Reverted to simplified DB strategy for first deploy: single Supabase project (`main`) shared by Git `dev` and `main`; Vercel production deploy remains `main` only | docs/01-technical-architecture.md, app/supabase/README.md, app/README.md |

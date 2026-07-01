@@ -93,10 +93,12 @@ This creates all tables: profiles, spots, reviews, exercises, etc.
 1. Push code to GitHub (already done!)
 2. Go to https://vercel.com/new
 3. Import your repo: `Paolo-Perazzolo/urban-athlete-platform`
-4. Add environment variables:
+4. Set project root to `app/`
+5. Add environment variables in Vercel:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-5. Click **Deploy**
+6. Use the same Supabase `main` project values for Preview/Development and Production
+7. Click **Deploy**
 
 Done! Your app is live in ~2 minutes.
 
