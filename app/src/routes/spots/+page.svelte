@@ -22,6 +22,19 @@
   let L = null;
 
   const FILTERS_KEY = 'ua_spots_filters';
+  const SPOT_PHOTO_SOURCES = [
+    '/images/spots/image1.webp',
+    '/images/spots/image2.webp',
+    '/images/spots/image3.jpg',
+    '/images/spots/image4.jpg',
+    '/images/spots/image5.webp',
+    '/images/spots/image6.jpg',
+    '/images/spots/image7.jpg',
+    '/images/spots/image7.jpeg',
+    '/images/spots/image8.jpg',
+    '/images/spots/image9.jpg',
+    '/images/spots/image10.jpg'
+  ];
 
   const DEFAULT_CENTER = [45.65, 13.77];
   const DEFAULT_ZOOM = 8;
@@ -179,10 +192,33 @@
     return spot.id || spot.name;
   }
 
+  function getStableOffset(value, modulo) {
+    const text = String(value || '');
+    let hash = 0;
+
+    for (let index = 0; index < text.length; index += 1) {
+      hash = (hash * 31 + text.charCodeAt(index)) >>> 0;
+    }
+
+    return modulo > 0 ? hash % modulo : 0;
+  }
+
   function getSpotImages(spot) {
-    return [1, 2, 3].map((slot) => ({
-      label: `${spot.name} · Photo ${slot}`
+    const offset = getStableOffset(getSpotKey(spot), SPOT_PHOTO_SOURCES.length);
+    const rotatedSources = SPOT_PHOTO_SOURCES.map(
+      (_, index) => SPOT_PHOTO_SOURCES[(index + offset) % SPOT_PHOTO_SOURCES.length]
+    );
+    const selectedSources = rotatedSources.slice(0, 2);
+
+    return selectedSources.map((src, index) => ({
+      src,
+      label: `${spot.name} · Photo ${index + 1}`
     }));
+  }
+
+  function getCurrentSpotImage(spot) {
+    const images = getSpotImages(spot);
+    return images[getCurrentImageIndex(spot)] ?? images[0];
   }
 
   function getCurrentImageIndex(spot) {
@@ -196,20 +232,6 @@
       ...galleryIndexes,
       [key]: newIndex
     };
-  }
-
-  function previousImage(spot) {
-    const images = getSpotImages(spot);
-    const current = getCurrentImageIndex(spot);
-    const next = (current - 1 + images.length) % images.length;
-    setImageIndex(spot, next);
-  }
-
-  function nextImage(spot) {
-    const images = getSpotImages(spot);
-    const current = getCurrentImageIndex(spot);
-    const next = (current + 1) % images.length;
-    setImageIndex(spot, next);
   }
 
   function openLightbox(spot) {
@@ -284,7 +306,7 @@
       <div class="grid gap-4">
         <div>
           <label for="city-filter" class="block text-sm font-medium text-neutral-300 mb-2">City</label>
-          <select id="city-filter" bind:value={selectedCity} class="input w-full">
+          <select id="city-filter" bind:value={selectedCity} class="input w-full pr-12">
             <option value="all">All Cities</option>
             <option value="trieste">Trieste</option>
             <option value="milan">Milan</option>
@@ -336,22 +358,29 @@
       </div>
     </div>
 
-    <div class="card p-5 mb-8">
-      <p class="block text-sm font-medium text-neutral-300 mb-2">View Mode</p>
-      <div class="grid grid-cols-2 gap-2 md:max-w-sm">
-        <button
-          on:click={() => (currentView = 'list')}
-          class="btn {currentView === 'list' ? 'btn-primary' : 'btn-accent'}"
-        >
-          List View
-        </button>
-        <button
-          on:click={() => (currentView = 'map')}
-          class="btn {currentView === 'map' ? 'btn-primary' : 'btn-accent'}"
-        >
-          Map View
-        </button>
-      </div>
+    <div class="mb-8 grid grid-cols-2 gap-2">
+      <button
+        on:click={() => (currentView = 'list')}
+        class="btn flex items-center justify-center gap-2 {currentView === 'list' ? 'btn-primary' : 'btn-accent'}"
+      >
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+          <path d="M8 7h12M8 12h12M8 17h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="4" cy="7" r="1" fill="currentColor" />
+          <circle cx="4" cy="12" r="1" fill="currentColor" />
+          <circle cx="4" cy="17" r="1" fill="currentColor" />
+        </svg>
+        <span>List View</span>
+      </button>
+      <button
+        on:click={() => (currentView = 'map')}
+        class="btn flex items-center justify-center gap-2 {currentView === 'map' ? 'btn-primary' : 'btn-accent'}"
+      >
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+          <path d="M4 6.5 9 4l6 2.5L20 4v13.5L15 20l-6-2.5L4 20V6.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M9 4v13.5M15 6.5V20" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        <span>Map View</span>
+      </button>
     </div>
 
     {#if showFilters}
@@ -439,26 +468,25 @@
 
                 <div class="relative mb-4">
                   <button
+                    type="button"
                     on:click={() => openLightbox(selectedSpot)}
-                    class="w-full aspect-video rounded-sm border border-neutral-800 bg-neutral-950 text-neutral-300 flex items-center justify-center"
+                    class="w-full aspect-video overflow-hidden rounded-sm border border-neutral-800 bg-neutral-950"
                   >
-                    <span class="text-xs">{getSpotImages(selectedSpot)[getCurrentImageIndex(selectedSpot)].label}</span>
+                    <img
+                      src={getCurrentSpotImage(selectedSpot).src}
+                      alt={getCurrentSpotImage(selectedSpot).label}
+                      class="h-full w-full object-cover"
+                      loading="lazy"
+                    />
                   </button>
 
-                  <button
-                    on:click={() => previousImage(selectedSpot)}
-                    class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-sm border border-neutral-700 bg-neutral-950/90 text-neutral-100 hover:border-neutral-500"
-                    aria-label="Previous image"
-                  >
-                    ←
-                  </button>
-                  <button
-                    on:click={() => nextImage(selectedSpot)}
-                    class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-sm border border-neutral-700 bg-neutral-950/90 text-neutral-100 hover:border-neutral-500"
-                    aria-label="Next image"
-                  >
-                    →
-                  </button>
+                  <div class="pointer-events-none absolute bottom-2 right-2 rounded-sm border border-neutral-700/70 bg-black/40 p-1.5 text-neutral-100/90">
+                    <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+                      <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.5" />
+                      <circle cx="9" cy="10" r="1.5" fill="currentColor" />
+                      <path d="m7 15 3-3 2.5 2.5L14 13l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </div>
                 </div>
 
                 <p class="text-sm text-neutral-400 mb-4">
@@ -497,7 +525,7 @@
       </div>
     {:else}
       <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {#each filteredSpots as spot}
+        {#each filteredSpots as spot (getSpotKey(spot))}
           <article class="card p-6 bg-neutral-900/90 border-neutral-800">
             <div class="flex items-start justify-between gap-3 mb-3">
               <h2 class="text-xl font-bold text-neutral-100">{spot.name}</h2>
@@ -506,30 +534,24 @@
 
             <div class="relative mb-4">
               <button
+                type="button"
                 on:click={() => openLightbox(spot)}
-                class="w-full aspect-video rounded-sm border border-neutral-800 bg-neutral-950 text-neutral-400 flex items-center justify-center hover:border-neutral-600 transition-colors"
+                class="w-full aspect-video overflow-hidden rounded-sm border border-neutral-800 bg-neutral-950 hover:border-neutral-600 transition-colors"
               >
-                <span class="text-xs">{getSpotImages(spot)[getCurrentImageIndex(spot)].label}</span>
+                <img
+                  src={getCurrentSpotImage(spot).src}
+                  alt={getCurrentSpotImage(spot).label}
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                />
               </button>
 
-              <button
-                on:click={() => previousImage(spot)}
-                class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-sm border border-neutral-700 bg-neutral-950/90 text-neutral-200 hover:border-neutral-500"
-                aria-label="Previous image"
-              >
-                ←
-              </button>
-
-              <button
-                on:click={() => nextImage(spot)}
-                class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-sm border border-neutral-700 bg-neutral-950/90 text-neutral-200 hover:border-neutral-500"
-                aria-label="Next image"
-              >
-                →
-              </button>
-
-              <div class="mt-2 text-[11px] text-neutral-500 text-center">
-                {getCurrentImageIndex(spot) + 1} / {getSpotImages(spot).length}
+              <div class="pointer-events-none absolute bottom-2 right-2 rounded-sm border border-neutral-700/70 bg-black/40 p-1.5 text-neutral-100/90">
+                <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4" aria-hidden="true">
+                  <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.5" />
+                  <circle cx="9" cy="10" r="1.5" fill="currentColor" />
+                  <path d="m7 15 3-3 2.5 2.5L14 13l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </div>
             </div>
 
@@ -574,8 +596,12 @@
         </div>
 
         <div class="relative">
-          <div class="w-full aspect-video rounded-sm border border-neutral-700 bg-neutral-950 text-neutral-300 flex items-center justify-center">
-            <span>{getSpotImages(lightboxSpot)[lightboxIndex].label}</span>
+          <div class="w-full aspect-video overflow-hidden rounded-sm border border-neutral-700 bg-neutral-950">
+            <img
+              src={getSpotImages(lightboxSpot)[lightboxIndex].src}
+              alt={getSpotImages(lightboxSpot)[lightboxIndex].label}
+              class="h-full w-full object-cover"
+            />
           </div>
 
           <button

@@ -1,4 +1,6 @@
 <script>
+  import { onDestroy, onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
   import content from '$lib/content/home.json';
 
   const featureVisuals = [
@@ -11,6 +13,28 @@
     { value: '25+', label: 'Outdoor spots' },
     { value: '150+', label: 'Athletes joined' }
   ];
+
+  const heroSpotImages = [
+    '/images/spots/image1.webp',
+    '/images/spots/image2.webp',
+    '/images/spots/image3.jpg',
+    '/images/spots/image4.jpg',
+    '/images/spots/image5.webp',
+    '/images/spots/image6.jpg'
+  ];
+
+  let heroImageIndex = 0;
+  let heroSlideshowInterval;
+
+  onMount(() => {
+    heroSlideshowInterval = setInterval(() => {
+      heroImageIndex = (heroImageIndex + 1) % heroSpotImages.length;
+    }, 3200);
+  });
+
+  onDestroy(() => {
+    clearInterval(heroSlideshowInterval);
+  });
 </script>
 
 <section class="relative overflow-hidden border-b border-neutral-900 bg-neutral-950">
@@ -54,12 +78,18 @@
 
       <div class="animate-fade-up-delayed lg:col-span-6">
         <div class="mx-auto max-w-xl overflow-hidden rounded-sm border border-neutral-800 bg-neutral-900">
-          <img
-            src="/images/image1.webp"
-            alt="Athlete training in the city"
-            class="h-80 w-full object-cover sm:h-[30rem]"
-            loading="eager"
-          />
+          <div class="relative h-80 sm:h-[30rem]">
+            {#key heroImageIndex}
+              <img
+                src={heroSpotImages[heroImageIndex]}
+                alt="Athlete training in the city"
+                class="absolute inset-0 h-full w-full object-cover"
+                loading="eager"
+                in:fade={{ duration: 700 }}
+                out:fade={{ duration: 700 }}
+              />
+            {/key}
+          </div>
           <div class="border-t border-neutral-800 bg-neutral-900/95 p-4">
             <p class="mb-1 text-xs uppercase tracking-[0.14em] text-neutral-500">Performance Layer</p>
             <p class="text-lg font-semibold text-neutral-100">Deterministic plans. Zero guesswork.</p>
